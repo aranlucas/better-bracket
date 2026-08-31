@@ -1,18 +1,7 @@
-BetterBracket
-=============
+# BetterBracket
 
-CIS 4301 Group project
+A CIS 4301 group project for managing tournament brackets.
 
-CODE IGNITER SETUP AND INSTALLATION
------------------------
-- Set up your git to have local files in your *www* or *htdocs* (local server folder).
-- Typing **localhost/BetterBracket/** will take you to the index. With a link to User Guide.
-- Take a look at **localhost/BetterBracket/application/controllers** and **localhost/BetterBracket/application/views** and figure out the welcome message. Play around and edit it to get a feel for codeigniters set up.
-- explore the other folders and definitely skim through the ***User Guide***
+## Run locally
 
- Database Setup
- --------------
- Located at **BetterBracket/application/config/database.php**
- - You will need to edit host, user, password, and database.
- 
-
+Place the repository in a local PHP server directory such as `www` or `htdocs`, configure the database in `application/config/database.php`, and open `/BetterBracket/` in the browser.
