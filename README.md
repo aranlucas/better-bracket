@@ -4,7 +4,7 @@ Better Bracket is a small tournament bracket app for making picks, creating grou
 
 ## Requirements
 
-- PHP 8.5.10 or newer (the Docker image follows the rolling PHP 8.5 line)
+- PHP 8.5 or newer (the Docker image follows the rolling PHP 8.5 line)
 - Composer 2.0.14+
 - PostgreSQL 14+ (PostgreSQL 18 is used by the included Docker setup)
 - PHP extensions: `intl`, `mbstring`, `pgsql`, and `pdo_pgsql`
@@ -31,6 +31,7 @@ Create a PostgreSQL database, run `db.sql`, and set the `database.default.*` val
 
 ```sh
 composer test
+composer lint
 php spark routes
 ```
 

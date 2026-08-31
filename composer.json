@@ -29,6 +29,6 @@
     },
     "scripts": {
         "test": "phpunit --testdox",
-        "lint": "php -l app/Config/App.php"
+        "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;"
     }
 }

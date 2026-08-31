@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use InvalidArgumentException;
@@ -7,7 +9,7 @@ use InvalidArgumentException;
 final class BracketService
 {
     /** @var list<array{1:int,2:int}> */
-    public const OPENING_MATCHUPS = [
+    public const array OPENING_MATCHUPS = [
         ['1' => 1, '2' => 16],
         ['1' => 8, '2' => 9],
         ['1' => 5, '2' => 12],
