@@ -1,0 +1,35 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      CI_ENVIRONMENT: development
+      app_baseURL: http://localhost:8080/
+      database_default_hostname: db
+      database_default_database: better_bracket
+      database_default_username: better_bracket
+      database_default_password: better_bracket_dev
+      database_default_DBDriver: Postgre
+      database_default_port: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: better_bracket
+      POSTGRES_USER: better_bracket
+      POSTGRES_PASSWORD: better_bracket_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U better_bracket -d better_bracket"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - better-bracket-db:/var/lib/postgresql
+      - ./db.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+
+volumes:
+  better-bracket-db:
