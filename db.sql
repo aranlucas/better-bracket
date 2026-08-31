@@ -1,4 +1,5 @@
--- Database: "BetterBracket"
+-- Better Bracket PostgreSQL schema and tournament seed data.
+-- Create a database first, then run this file with psql.
 
 -- DROP DATABASE "BetterBracket";
 /*
@@ -11,40 +12,35 @@ CREATE DATABASE "BetterBracket"
        CONNECTION LIMIT = -1;
 */
 
-CREATE SEQUENCE user_id_seq;
 CREATE TABLE users
 (
-  id integer NOT NULL DEFAULT nextval('user_id_seq'),
-  email character varying(125),
-  password varchar(256),
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email character varying(125) NOT NULL,
+  password varchar(256) NOT NULL,
   date_joined timestamp without time zone DEFAULT statement_timestamp(),
-  CONSTRAINT users_table_pkey PRIMARY KEY (id),
   CONSTRAINT emails UNIQUE(email)
 );
-ALTER SEQUENCE user_id_seq OWNED BY users.id;
 
 CREATE TABLE users_profile
 (
-  user_id integer NOT NULL,
-  first character varying(125),
-  last character varying(125),
+  user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  first character varying(125) NOT NULL,
+  last character varying(125) NOT NULL,
   description TEXT,
   caption character varying(125)
 );
 
-CREATE SEQUENCE group_id_seq;
 CREATE TABLE groups
 (
-  id integer NOT NULL DEFAULT nextval('group_id_seq'),
-  name character varying(125),
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name character varying(125) NOT NULL,
   date_created timestamp without time zone DEFAULT statement_timestamp(),
-  CONSTRAINT groups_table_pkey PRIMARY KEY (id)
+  CONSTRAINT groups_name_unique UNIQUE(name)
 );
-ALTER SEQUENCE group_id_seq OWNED BY groups.id;
 
 CREATE TABLE groups_profile
 (
-  group_id integer NOT NULL,
+  group_id integer PRIMARY KEY REFERENCES groups(id) ON DELETE CASCADE,
   picturelocation character varying(256),
   description TEXT,
   caption character varying(125)
@@ -53,54 +49,49 @@ CREATE TABLE groups_profile
 
 CREATE TABLE user_groups
 (
-  group_id integer NOT NULL,
-  user_id integer NOT NULL
+  group_id integer NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  PRIMARY KEY (group_id, user_id)
 );
 
-CREATE SEQUENCE team_id_seq;
 CREATE TABLE teams  (
-  id INTEGER NOT NULL DEFAULT nextval('team_id_seq'),
-  team_name character varying(126),
-  seed integer,
-  region varchar(8),
-  CONSTRAINT teams_table_pkey PRIMARY KEY (id)
+  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  team_name character varying(126) NOT NULL,
+  seed integer NOT NULL CHECK (seed BETWEEN 1 AND 16),
+  region varchar(8) NOT NULL CHECK (region IN ('south', 'west', 'east', 'midwest')),
+  CONSTRAINT teams_region_seed_unique UNIQUE(region, seed)
 );
-ALTER SEQUENCE team_id_seq OWNED BY teams.id;
 
-CREATE SEQUENCE games_id_seq;
 CREATE TABLE games  (
-  id INTEGER NOT NULL DEFAULT nextval('games_id_seq'),
-  team_id_1 INTEGER,
-  team_id_2 INTEGER,
-  date_played timestamp,
-  CONSTRAINT games_table_pkey PRIMARY KEY (id)
+  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  team_id_1 INTEGER NOT NULL REFERENCES teams(id),
+  team_id_2 INTEGER NOT NULL REFERENCES teams(id),
+  date_played timestamp NOT NULL,
+  CONSTRAINT games_distinct_teams CHECK (team_id_1 <> team_id_2)
 );
 
 CREATE TABLE scores  (
-  game_id INTEGER NOT NULL,
-  score SMALLINT,
-  score_2 SMALLINT,
-  FOREIGN KEY (game_id) REFERENCES games (id)
+  game_id INTEGER PRIMARY KEY REFERENCES games (id) ON DELETE CASCADE,
+  score SMALLINT NOT NULL CHECK (score >= 0),
+  score_2 SMALLINT NOT NULL CHECK (score_2 >= 0)
 );
 
 
 
 
 
-CREATE SEQUENCE pick_id_seq;
 CREATE TABLE picks
 (
-  id integer NOT NULL DEFAULT nextval('pick_id_seq'),
-  user_id INTEGER,
-  group_id INTEGER,
-  team_id INTEGER,
-  region SMALLINT,
-  round SMALLINT,
-  game SMALLINT,
-  team SMALLINT,
-  CONSTRAINT picks_table_pkey PRIMARY KEY (user_id)
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  team_id INTEGER NOT NULL REFERENCES teams(id),
+  region SMALLINT NOT NULL CHECK (region BETWEEN 0 AND 4),
+  round SMALLINT NOT NULL CHECK (round BETWEEN 1 AND 6),
+  game SMALLINT NOT NULL CHECK (game BETWEEN 1 AND 8),
+  team SMALLINT NOT NULL CHECK (team BETWEEN 1 AND 2),
+  CONSTRAINT picks_location_unique UNIQUE (user_id, group_id, region, round, game, team)
 );
-ALTER SEQUENCE pick_id_seq OWNED BY picks.id;
 
 /*
 
@@ -674,31 +665,19 @@ VALUES(
 
 
 
-CREATE VIEW TeamsGames as select team_name, date_played, a.id from (select * from games) as a inner join (select * from teams) as b on b.id = a.team_id_1 OR b.id = a.team_id_2;--Relation between Games and Teams, without scores
+CREATE VIEW TeamsGames AS
+SELECT g.id, g.date_played, t.team_name, t.id AS team_id
+FROM games g
+JOIN teams t ON t.id IN (g.team_id_1, g.team_id_2);
 
-CREATE VIEW GamesScores as select * from TeamsGames join (select * from scores) as a on TeamsGames.id = a.game_id; --Relation between Games, Scores, and Teams to give the Teams that played which game whith what score
+CREATE VIEW GamesScores AS
+SELECT g.id AS game_id, g.date_played, t1.team_name AS team_1,
+       t2.team_name AS team_2, s.score AS score_1, s.score_2
+FROM games g
+JOIN teams t1 ON t1.id = g.team_id_1
+JOIN teams t2 ON t2.id = g.team_id_2
+JOIN scores s ON s.game_id = g.id;
 
-CREATE VIEW bracket_teams as (
-with bracket_games as (
-SELECT teams.id as team_id, team_name,seed,region,date_played from games,teams WHERE games.team_id_1 = teams.id
-UNION
-SELECT teams.id as team_id, team_name,seed,region,date_played from games,teams WHERE games.team_id_2 = teams.id ORDER BY seed ASC),
-round1 as (SELECT 1 as round,team_id, team_name,seed,region from bracket_games where date_played = '2014-03-20' OR date_played = '2014-03-21'),
-round2 as (SELECT 2 as round,team_id, team_name,seed,region from bracket_games where date_played = '2014-03-22' OR date_played = '2014-03-23'),
-round3 as (SELECT 2 as round,team_id, team_name,seed,region from bracket_games where date_played = '2014-03-27' OR date_played = '2014-03-28'),
-round4 as (SELECT 2 as round,team_id, team_name,seed,region from bracket_games where date_played = '2014-03-29' OR date_played = '2014-03-30'),
-round5 as (SELECT 2 as round,team_id, team_name,seed,region from bracket_games where date_played = '2014-04-05'),
-round6 as (SELECT 2 as round,team_id, team_name,seed,region from bracket_games where date_played = '2014-04-07')
-	
-select * from round1
-UNION
-select * from round2
-UNION 
-select * from round3
-UNION 
-select * from round4
-UNION 
-select * from round5
-UNION 
-select * from round6);
-
+CREATE VIEW bracket_teams AS
+SELECT id AS team_id, team_name, seed, region, 1 AS round
+FROM teams;
