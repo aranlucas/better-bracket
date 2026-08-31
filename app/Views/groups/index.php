@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'My groups']) ?>
 <section class="container page-heading compact-heading">
     <div><div class="eyebrow">Your circles</div><h1>My groups</h1><p class="lede">Keep your people and your picks together.</p></div>

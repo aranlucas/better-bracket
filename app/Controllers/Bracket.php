@@ -56,6 +56,7 @@ class Bracket extends BaseController
 
         try {
             $normalized = BracketService::normalizePicks($picks);
+            BracketService::validateConsistency($normalized);
             $validTeamIds = array_map(
                 static fn (array $team): int => (int) $team['id'],
                 $groupModel->bracketTeams(),
@@ -81,6 +82,7 @@ class Bracket extends BaseController
         ]);
     }
 
+    /** @param array<string, mixed> $data */
     private function json(array $data, int $status = 200): ResponseInterface
     {
         return $this->response->setStatusCode($status)->setJSON($data);

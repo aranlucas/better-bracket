@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <header class="site-header">
     <div class="container nav-wrap">
         <a class="brand" href="<?= base_url(is_authenticated() ? 'dashboard' : 'login') ?>" aria-label="Better Bracket home">

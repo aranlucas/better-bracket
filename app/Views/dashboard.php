@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'Dashboard']) ?>
 <?php $groupCount = count($groups); ?>
 <section class="container page-heading">

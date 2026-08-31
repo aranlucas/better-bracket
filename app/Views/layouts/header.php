@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $title = $title ?? 'Better Bracket';
 $description = $description ?? 'Build, share, and follow tournament brackets with your groups.';
 ?>

@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    command: sh -c "php spark migrate --all && apache2-foreground"
     ports:
       - "8080:80"
     environment:

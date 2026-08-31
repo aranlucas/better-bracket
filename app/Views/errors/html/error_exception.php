@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 use CodeIgniter\HTTP\Header;
 use CodeIgniter\CodeIgniter;
 

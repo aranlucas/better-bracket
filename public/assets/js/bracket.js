@@ -50,6 +50,15 @@
 
             var slot = button.dataset.slot;
             var details = teamDetails(button);
+            if (slot !== 'champion') {
+                var game = slot.split('-').slice(0, 3).join('-');
+                Object.keys(picks).forEach(function (pickSlot) {
+                    if (pickSlot.startsWith(game + '-')) delete picks[pickSlot];
+                });
+                document.querySelectorAll('[data-slot^="' + game + '-"]').forEach(function (item) {
+                    item.classList.remove('is-selected');
+                });
+            }
             picks[slot] = Number(details.id);
             document.querySelectorAll('[data-slot="' + slot + '"]').forEach(function (item) { item.classList.remove('is-selected'); });
             button.classList.add('is-selected');

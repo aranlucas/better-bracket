@@ -15,6 +15,7 @@ class UserModel extends Model
     protected $allowedFields = ['email', 'password'];
     protected $useTimestamps = false;
 
+    /** @return array<string, mixed>|null */
     public function findByEmail(string $email): ?array
     {
         $user = $this->where('email', strtolower(trim($email)))->first();
@@ -22,6 +23,7 @@ class UserModel extends Model
         return is_array($user) ? $user : null;
     }
 
+    /** @return array<string, mixed>|null */
     public function profileFor(int $id): ?array
     {
         $profile = $this->db->table('users u')
@@ -38,6 +40,7 @@ class UserModel extends Model
      * Creates an account while preserving the original app's profile row.
      * The transaction prevents an account without a matching profile.
      */
+    /** @return array{id?: int, email?: string, error?: string} */
     public function createAccount(string $first, string $last, string $email, string $password): array
     {
         $email = strtolower(trim($email));
@@ -79,6 +82,7 @@ class UserModel extends Model
         }
     }
 
+    /** @return array{id: int, email: string}|null */
     public function authenticate(string $email, string $password): ?array
     {
         $user = $this->findByEmail($email);
@@ -98,6 +102,10 @@ class UserModel extends Model
 
         if (! $valid) {
             return null;
+        }
+
+        if (password_needs_rehash((string) $user['password'], PASSWORD_DEFAULT)) {
+            $this->update($user['id'], ['password' => password_hash($password, PASSWORD_DEFAULT)]);
         }
 
         return ['id' => (int) $user['id'], 'email' => (string) $user['email']];

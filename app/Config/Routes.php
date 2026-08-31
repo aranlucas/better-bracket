@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
+$routes->get('health/live', 'Health::live');
+$routes->get('health/ready', 'Health::ready');
 $routes->get('login', 'Auth::loginForm');
 $routes->post('login', 'Auth::login');
 $routes->post('register', 'Auth::register');

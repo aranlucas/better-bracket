@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => $group['name']]) ?>
 <section class="container narrow-content">
     <a class="back-link" href="<?= base_url('groups') ?>">← Back to groups</a>

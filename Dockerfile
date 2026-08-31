@@ -21,3 +21,6 @@ RUN mkdir -p writable/cache writable/debugbar writable/logs writable/session wri
     && chown -R www-data:www-data writable
 
 EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl --fail --silent http://localhost/health/ready > /dev/null || exit 1

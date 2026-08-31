@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'Your profile']) ?>
 <section class="container page-heading compact-heading"><div><div class="eyebrow">Your account</div><h1>Profile</h1><p class="lede">The details connected to your Better Bracket account.</p></div></section>
 <section class="container narrow-content">
