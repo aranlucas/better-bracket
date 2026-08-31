@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'Welcome']) ?>
 <section class="auth-shell container">
     <div class="auth-intro">

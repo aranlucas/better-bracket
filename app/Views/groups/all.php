@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'All groups']) ?>
 <section class="container page-heading compact-heading"><div><div class="eyebrow">Find your people</div><h1>All groups</h1><p class="lede">Browse the bracket communities on this board.</p></div></section>
 <section class="container section-block">

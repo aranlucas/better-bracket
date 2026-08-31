@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'Past games']) ?>
 <section class="container page-heading compact-heading"><div><div class="eyebrow">The record</div><h1>Past games</h1><p class="lede">A quick look back at the games on this board.</p></div></section>
 <section class="container section-block">

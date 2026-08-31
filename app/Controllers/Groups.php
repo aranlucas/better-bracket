@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Models\GroupModel;
@@ -9,7 +11,7 @@ use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Groups extends BaseController
 {
-    public function index()
+    public function index(): string|ResponseInterface
     {
         $userId = $this->authenticatedUser();
         if ($userId === null) {
@@ -22,7 +24,7 @@ class Groups extends BaseController
         ]);
     }
 
-    public function all()
+    public function all(): string|ResponseInterface
     {
         if ($this->authenticatedUser() === null) {
             return redirect()->to('/login');
@@ -34,7 +36,7 @@ class Groups extends BaseController
         ]);
     }
 
-    public function createForm()
+    public function createForm(): string|ResponseInterface
     {
         if ($this->authenticatedUser() === null) {
             return redirect()->to('/login');
@@ -84,7 +86,7 @@ class Groups extends BaseController
         return redirect()->to('/groups/' . $result['id']);
     }
 
-    public function show(int $id)
+    public function show(int $id): string|ResponseInterface
     {
         if ($this->authenticatedUser() === null) {
             return redirect()->to('/login');

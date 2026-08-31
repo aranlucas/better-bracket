@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'Make your picks', 'description' => 'Choose a winner for every tournament matchup.']) ?>
 <?php
 $regions = ['south', 'west', 'east', 'midwest'];

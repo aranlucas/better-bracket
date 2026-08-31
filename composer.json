@@ -9,6 +9,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.3"
     },
     "autoload": {
@@ -24,11 +25,26 @@
     },
     "config": {
         "optimize-autoloader": true,
+        "platform-check": true,
+        "policy": {
+            "abandoned": {
+                "audit": "fail",
+                "block": true
+            }
+        },
         "preferred-install": "dist",
         "sort-packages": true
     },
     "scripts": {
+        "check": [
+            "@lint",
+            "@analyse",
+            "@test",
+            "@composer validate --strict",
+            "@composer audit --locked"
+        ],
+        "analyse": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --testdox",
-        "lint": "php -l app/Config/App.php"
+        "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;"
     }
 }

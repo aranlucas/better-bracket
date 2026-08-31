@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Models\UserModel;
@@ -23,6 +25,12 @@ class Auth extends BaseController
         }
 
         $email = strtolower(trim((string) $this->request->getPost('email')));
+        if (! $this->allowAuthAttempt('login', $email, 5, 300)) {
+            session()->setFlashdata('error', 'Too many sign-in attempts. Please wait a few minutes and try again.');
+
+            return redirect()->back()->withInput()->setStatusCode(429);
+        }
+
         $password = (string) $this->request->getPost('password');
         $user = (new UserModel())->authenticate($email, $password);
 
@@ -50,6 +58,12 @@ class Auth extends BaseController
             'email'    => strtolower(trim((string) $this->request->getPost('email'))),
             'password' => (string) $this->request->getPost('password'),
         ];
+
+        if (! $this->allowAuthAttempt('register', $data['email'], 5, 900)) {
+            session()->setFlashdata('error', 'Too many registration attempts. Please wait and try again.');
+
+            return redirect()->back()->withInput()->setStatusCode(429);
+        }
 
         if (! $this->validateData($data, [
             'first'    => 'required|min_length[2]|max_length[125]',
@@ -91,5 +105,12 @@ class Auth extends BaseController
         session()->destroy();
 
         return redirect()->to('/login');
+    }
+
+    private function allowAuthAttempt(string $action, string $email, int $capacity, int $seconds): bool
+    {
+        $identity = $this->request->getIPAddress() . '|' . $email;
+
+        return service('throttler')->check($action . ':' . hash('sha256', $identity), $capacity, $seconds);
     }
 }

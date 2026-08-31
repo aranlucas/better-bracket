@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Config;
 
 use CodeIgniter\Config\Filters as BaseFilters;
@@ -24,7 +26,7 @@ class Filters extends BaseFilters
 
     /** @var array{before: list<string>, after: list<string>} */
     public array $globals = [
-        'before' => ['csrf'],
+        'before' => ['csrf' => ['except' => ['health/*']]],
         'after'  => ['secureheaders'],
     ];
 

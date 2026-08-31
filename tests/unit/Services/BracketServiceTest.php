@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Services;
 
 use App\Services\BracketService;
@@ -48,5 +50,39 @@ final class BracketServiceTest extends TestCase
         self::assertSame([['region' => 'south', 'id' => 1]], $regions['south']);
         self::assertSame([['region' => 'WEST', 'id' => 2]], $regions['west']);
         self::assertSame([], $regions['east']);
+    }
+
+    public function testRejectsTwoWinnersForOneGame(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Choose only one winner');
+
+        BracketService::validateConsistency(BracketService::normalizePicks([
+            '1-1-1-1' => 1,
+            '1-1-1-2' => 16,
+        ]));
+    }
+
+    public function testRejectsTeamThatDidNotAdvance(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('must have won');
+
+        BracketService::validateConsistency(BracketService::normalizePicks([
+            '1-1-1-1' => 1,
+            '1-2-1-1' => 16,
+        ]));
+    }
+
+    public function testAcceptsConsistentPartialBracket(): void
+    {
+        $picks = BracketService::normalizePicks([
+            '1-1-1-1' => 1,
+            '1-2-1-1' => 1,
+        ]);
+
+        BracketService::validateConsistency($picks);
+
+        self::assertCount(2, $picks);
     }
 }

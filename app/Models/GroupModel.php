@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Services\BracketService;
@@ -14,6 +16,7 @@ class GroupModel extends Model
     protected $allowedFields = ['name'];
     protected $useTimestamps = false;
 
+    /** @return list<array<string, mixed>> */
     public function forUser(int $userId): array
     {
         return $this->db->table('groups g')
@@ -26,6 +29,7 @@ class GroupModel extends Model
             ->getResultArray();
     }
 
+    /** @return list<array<string, mixed>> */
     public function all(): array
     {
         return $this->db->table('groups g')
@@ -36,6 +40,7 @@ class GroupModel extends Model
             ->getResultArray();
     }
 
+    /** @return array<string, mixed>|null */
     public function findWithProfile(int $id): ?array
     {
         $group = $this->db->table('groups g')
@@ -48,6 +53,7 @@ class GroupModel extends Model
         return is_array($group) ? $group : null;
     }
 
+    /** @return list<array<string, mixed>> */
     public function members(int $id): array
     {
         return $this->db->table('user_groups ug')
@@ -68,6 +74,7 @@ class GroupModel extends Model
             ->countAllResults() > 0;
     }
 
+    /** @return array{id?: int, error?: string} */
     public function createGroup(string $name, string $description, string $caption, int $ownerId): array
     {
         try {
@@ -116,6 +123,7 @@ class GroupModel extends Model
         ]) !== false;
     }
 
+    /** @return list<array<string, mixed>> */
     public function bracketTeams(): array
     {
         return $this->db->table('teams')
@@ -126,6 +134,7 @@ class GroupModel extends Model
             ->getResultArray();
     }
 
+    /** @param list<array{team_id:int, region:int, round:int, game:int, team:int}> $picks */
     public function savePicks(int $groupId, int $userId, array $picks): bool
     {
         try {
@@ -162,6 +171,7 @@ class GroupModel extends Model
         }
     }
 
+    /** @return list<array<string, mixed>> */
     public function pastGames(): array
     {
         return $this->db->table('games g')
