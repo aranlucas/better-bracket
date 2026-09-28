@@ -1,6 +1,28 @@
 # Better Bracket
 
-Better Bracket is a small tournament bracket app for making picks, creating groups, and following past games. The original CodeIgniter 2 application has been rewritten on CodeIgniter 4 with a public web root, Composer-managed dependencies, secure sessions, password hashing, CSRF protection, and a responsive vanilla-JS interface.
+[![CI](https://github.com/aranlucas/better-bracket/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aranlucas/better-bracket/actions/workflows/ci.yml)
+[![MIT License](https://img.shields.io/github/license/aranlucas/better-bracket)](LICENSE)
+![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
+![CodeIgniter](https://img.shields.io/badge/CodeIgniter-4-EF4223?logo=codeigniter&logoColor=white)
+
+![Illustrated tournament bracket bringing a group of picks together](docs/images/readme-cover.png)
+
+*Concept artwork for tournament night; it is not an application screenshot.*
+
+
+**Make your picks. Bring your group. See who called it.**
+
+Better Bracket is a tournament bracket and group manager, originally built as a CIS 4301 project and later modernized on CodeIgniter 4. Set up a bracket, invite your group to make picks, then follow results and look back at past games.
+
+## Bracket night, made easy
+
+1. Create or join a group around a tournament.
+2. Fill in your bracket and compare picks with the group.
+3. Follow recorded games and see how everyone's predictions hold up.
+
+The app combines a responsive web interface with PostgreSQL-backed tournament data. The included dataset keeps historical games available for browsing.
+
+## Get it running
 
 ## Requirements
 
