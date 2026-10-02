@@ -20,10 +20,13 @@ class Bracket extends BaseController
 
         $groupModel = new GroupModel();
 
+        $teams = $groupModel->bracketTeams();
+
         return view('bracket/index', [
             'title'  => 'Make your picks',
             'groups' => $groupModel->forUser($userId),
-            'teams'  => BracketService::teamsByRegion($groupModel->bracketTeams()),
+            'teams'  => BracketService::teamsByRegion($teams),
+            'definition' => BracketService::definition($teams),
         ]);
     }
 
@@ -55,18 +58,7 @@ class Bracket extends BaseController
         }
 
         try {
-            $normalized = BracketService::normalizePicks($picks);
-            BracketService::validateConsistency($normalized);
-            $validTeamIds = array_map(
-                static fn (array $team): int => (int) $team['id'],
-                $groupModel->bracketTeams(),
-            );
-
-            foreach ($normalized as $pick) {
-                if (! in_array($pick['team_id'], $validTeamIds, true)) {
-                    throw new InvalidArgumentException('The bracket contains an unknown team.');
-                }
-            }
+            $normalized = BracketService::validatePicks($picks, $groupModel->bracketTeams());
         } catch (InvalidArgumentException $exception) {
             return $this->json(['ok' => false, 'error' => $exception->getMessage()], 422);
         }
