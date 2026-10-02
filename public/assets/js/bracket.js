@@ -8,70 +8,50 @@
     var status = document.getElementById('bracket-status');
     var csrfToken = document.querySelector('meta[name="csrf-token"]');
 
-    function destinationFor(region, round, game) {
-        if (round < 4) {
-            return region + '-' + (round + 1) + '-' + Math.ceil(game / 2) + '-' + (game % 2 === 1 ? 1 : 2);
-        }
-        if (round === 4) {
-            var regionalFinals = {
-                1: '1-5-1-1',
-                2: '1-5-1-2',
-                3: '2-5-1-1',
-                4: '2-5-1-2'
+    var definitionElement = document.getElementById('bracket-definition');
+    if (!definitionElement) return;
+    var definition = JSON.parse(definitionElement.textContent);
+    var state = window.BracketState;
+    var buttons = document.querySelectorAll('.team-choice, .champion-choice');
+    var teams = {};
+    var placeholders = {};
+
+    buttons.forEach(function (button) {
+        placeholders[button.dataset.slot] = button.querySelector('.team-name').textContent;
+        if (button.dataset.teamId) {
+            var seed = button.querySelector('.seed');
+            teams[button.dataset.teamId] = {
+                seed: seed ? seed.textContent : '',
+                name: button.querySelector('.team-name').textContent
             };
-            return regionalFinals[region];
         }
-        if (round === 5 && region < 3) {
-            return region === 1 ? '3-5-1-1' : '3-5-1-2';
-        }
-        return 'champion';
+    });
+
+    function render() {
+        buttons.forEach(function (button) {
+            var slot = button.dataset.slot;
+            var teamId = state.teamFor(definition, picks, slot);
+            var details = teams[teamId];
+            button.dataset.teamId = details ? String(teamId) : '';
+            button.disabled = !details;
+            button.classList.toggle('is-selected', picks[slot] === teamId && !!details);
+            var seed = button.querySelector('.seed');
+            if (seed) seed.textContent = details ? details.seed : '';
+            button.querySelector('.team-name').textContent = details ? details.name : placeholders[slot];
+        });
     }
 
-    function setTeam(slot, teamId, seed, name) {
-        var target = document.querySelector('[data-slot="' + slot + '"]');
-        if (!target) return;
-        target.dataset.teamId = teamId;
-        target.disabled = false;
-        target.querySelector('.seed').textContent = seed || '';
-        target.querySelector('.team-name').textContent = name;
-    }
-
-    function teamDetails(button) {
-        return {
-            id: button.dataset.teamId,
-            seed: button.querySelector('.seed').textContent,
-            name: button.querySelector('.team-name').textContent
-        };
-    }
-
-    document.querySelectorAll('.team-choice, .champion-choice').forEach(function (button) {
+    buttons.forEach(function (button) {
         button.addEventListener('click', function () {
             if (!button.dataset.teamId) return;
-
             var slot = button.dataset.slot;
-            var details = teamDetails(button);
-            if (slot !== 'champion') {
-                var game = slot.split('-').slice(0, 3).join('-');
-                Object.keys(picks).forEach(function (pickSlot) {
-                    if (pickSlot.startsWith(game + '-')) delete picks[pickSlot];
-                });
-                document.querySelectorAll('[data-slot^="' + game + '-"]').forEach(function (item) {
-                    item.classList.remove('is-selected');
-                });
+            picks = state.chooseWinner(definition, picks, slot);
+            render();
+            if (status) {
+                status.textContent = slot === 'champion'
+                    ? 'Champion selected. Save your picks when ready.'
+                    : Object.keys(picks).length + ' selection' + (Object.keys(picks).length === 1 ? '' : 's') + ' ready to save.';
             }
-            picks[slot] = Number(details.id);
-            document.querySelectorAll('[data-slot="' + slot + '"]').forEach(function (item) { item.classList.remove('is-selected'); });
-            button.classList.add('is-selected');
-
-            if (slot === 'champion') {
-                if (status) status.textContent = 'Champion selected. Save your picks when ready.';
-                return;
-            }
-
-            var parts = slot.split('-').map(Number);
-            var destination = destinationFor(parts[0], parts[1], parts[2]);
-            if (destination) setTeam(destination, details.id, details.seed, details.name);
-            if (status) status.textContent = Object.keys(picks).length + ' pick' + (Object.keys(picks).length === 1 ? '' : 's') + ' ready to save.';
         });
     });
 

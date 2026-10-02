@@ -40,11 +40,13 @@
             "@lint",
             "@analyse",
             "@test",
+            "@test:browser",
             "@composer validate --strict",
             "@composer audit --locked"
         ],
         "analyse": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --testdox",
-        "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;"
+        "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;",
+        "test:browser": "node --test tests/browser/*.test.cjs"
     }
 }

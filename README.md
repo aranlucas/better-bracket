@@ -58,7 +58,7 @@ composer check
 php spark routes
 ```
 
-`composer check` runs syntax checks, PHPStan, PHPUnit, strict Composer validation, and the dependency audit.
+`composer check` runs syntax checks, PHPStan, PHPUnit, browser-state contract tests, strict Composer validation, and the dependency audit. Checks also require Node.js 18+ and the PHP `sqlite3` extension; the database regression uses an isolated in-memory database. Browser-state tests render the real bracket template with synthetic teams and verify submitted picks against the server validator.
 
 The application exposes `/health/live` for process health and `/health/ready` for application and database readiness.
 

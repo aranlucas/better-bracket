@@ -6,8 +6,14 @@ namespace App\Services;
 
 use InvalidArgumentException;
 
+/**
+ * @phpstan-type Slot array{region:int, round:int, game:int, team:int, feeders:list<string>, team_id:?int}
+ */
 final class BracketService
 {
+    public const array REGIONS = ['south', 'west', 'east', 'midwest'];
+    public const array GAMES_BY_ROUND = [1 => 8, 2 => 4, 3 => 2, 4 => 1];
+
     /** @var list<array{1:int,2:int}> */
     public const array OPENING_MATCHUPS = [
         ['1' => 1, '2' => 16],
@@ -21,123 +27,115 @@ final class BracketService
     ];
 
     /**
-     * Converts the browser's slot map into database rows and rejects malformed
-     * keys before they reach the database.
+     * The legal slots and their inputs, shared by validation and browser transitions.
+     * Champion is the existing optional confirmation of the championship winner.
      *
-     * @param array<string, mixed> $picks
-     * @return list<array{team_id:int, region:int, round:int, game:int, team:int}>
+     * @param list<array<string, mixed>> $teams
+     * @return array<string, Slot>
      */
-    public static function normalizePicks(array $picks): array
+    public static function definition(array $teams): array
     {
-        if (count($picks) > 63) {
-            throw new InvalidArgumentException('A bracket cannot contain more than 63 picks.');
+        $bySeed = [];
+        foreach ($teams as $team) {
+            $bySeed[strtolower((string) $team['region'])][(int) $team['seed']] = (int) $team['id'];
         }
 
+        $slots = [];
+        foreach (self::REGIONS as $index => $regionName) {
+            $region = $index + 1;
+            foreach (self::GAMES_BY_ROUND as $round => $gameCount) {
+                for ($game = 1; $game <= $gameCount; $game++) {
+                    for ($team = 1; $team <= 2; $team++) {
+                        $sourceGame = ($game - 1) * 2 + $team;
+                        $slots["{$region}-{$round}-{$game}-{$team}"] = [
+                            'region' => $region, 'round' => $round, 'game' => $game, 'team' => $team,
+                            'feeders' => $round === 1 ? [] : self::gameSlots($region, $round - 1, $sourceGame),
+                            'team_id' => $round === 1 ? ($bySeed[$regionName][self::OPENING_MATCHUPS[$game - 1][$team]] ?? null) : null,
+                        ];
+                    }
+                }
+            }
+        }
+
+        for ($region = 1; $region <= 3; $region++) {
+            for ($team = 1; $team <= 2; $team++) {
+                $sourceRegion = $region < 3 ? ($region - 1) * 2 + $team : $team;
+                $slots["{$region}-5-1-{$team}"] = [
+                    'region' => $region, 'round' => 5, 'game' => 1, 'team' => $team,
+                    'feeders' => self::gameSlots($sourceRegion, $region < 3 ? 4 : 5, 1),
+                    'team_id' => null,
+                ];
+            }
+        }
+        $slots['champion'] = [
+            'region' => 0, 'round' => 6, 'game' => 1, 'team' => 1,
+            'feeders' => self::gameSlots(3, 5, 1), 'team_id' => null,
+        ];
+
+        return $slots;
+    }
+
+    /**
+     * Validate the complete selection before returning rows suitable for persistence.
+     * Partial brackets are allowed, but every pick must have a legal path from its seed.
+     *
+     * @param array<string, mixed> $picks
+     * @param list<array<string, mixed>> $teams
+     * @return list<array{team_id:int, region:int, round:int, game:int, team:int}>
+     */
+    public static function validatePicks(array $picks, array $teams): array
+    {
+        // 63 game winners plus the optional, separately stored champion confirmation.
+        if (count($picks) > 64) {
+            throw new InvalidArgumentException('A bracket cannot contain more than 64 selections.');
+        }
+
+        $definition = self::definition($teams);
+        $selected = [];
+        $games = [];
         $normalized = [];
         foreach ($picks as $slot => $teamId) {
-            if (! is_string($slot) || ! is_numeric($teamId) || (int) $teamId < 1) {
+            if (! is_string($slot) || ! isset($definition[$slot])) {
+                throw new InvalidArgumentException('The bracket contains an invalid game slot.');
+            }
+            if ((! is_int($teamId) && (! is_string($teamId) || ! ctype_digit($teamId) || (string) (int) $teamId !== $teamId)) || (int) $teamId < 1) {
                 throw new InvalidArgumentException('The bracket contains an invalid team selection.');
             }
 
-            if ($slot === 'champion') {
-                $normalized[] = [
-                    'team_id' => (int) $teamId,
-                    'region'  => 0,
-                    'round'   => 6,
-                    'game'    => 1,
-                    'team'    => 1,
-                ];
+            $entry = $definition[$slot];
+            $gameKey = $entry['region'] . '-' . $entry['round'] . '-' . $entry['game'];
+            if (isset($games[$gameKey])) {
+                throw new InvalidArgumentException('Choose only one winner for each game.');
+            }
+            $games[$gameKey] = true;
+            $selected[$slot] = (int) $teamId;
+            $normalized[] = [
+                'team_id' => (int) $teamId, 'region' => $entry['region'],
+                'round' => $entry['round'], 'game' => $entry['game'], 'team' => $entry['team'],
+            ];
+        }
+
+        foreach ($selected as $slot => $teamId) {
+            $entry = $definition[$slot];
+            if ($entry['feeders'] === []) {
+                if ($teamId !== $entry['team_id']) {
+                    throw new InvalidArgumentException('An opening-round pick must match its region and seed.');
+                }
                 continue;
             }
-
-            if (preg_match('/\A([1-4])-([1-5])-([1-8])-(1|2)\z/', $slot, $matches) !== 1) {
-                throw new InvalidArgumentException('The bracket contains an invalid game slot.');
+            $eligible = array_intersect_key($selected, array_flip($entry['feeders']));
+            if (! in_array($teamId, $eligible, true)) {
+                throw new InvalidArgumentException('A later-round pick must have won its previous game.');
             }
-
-            $normalized[] = [
-                'team_id' => (int) $teamId,
-                'region'  => (int) $matches[1],
-                'round'   => (int) $matches[2],
-                'game'    => (int) $matches[3],
-                'team'    => (int) $matches[4],
-            ];
         }
 
         return $normalized;
     }
 
-    /**
-     * @param list<array{team_id:int, region:int, round:int, game:int, team:int}> $picks
-     */
-    public static function validateConsistency(array $picks): void
+    /** @return list<string> */
+    private static function gameSlots(int $region, int $round, int $game): array
     {
-        $slots = [];
-        $games = [];
-
-        foreach ($picks as $pick) {
-            $slot = self::slotKey($pick);
-            $game = $pick['region'] . '-' . $pick['round'] . '-' . $pick['game'];
-            if (isset($games[$game])) {
-                throw new InvalidArgumentException('Choose only one winner for each game.');
-            }
-
-            $games[$game] = true;
-            $slots[$slot] = $pick['team_id'];
-        }
-
-        foreach ($picks as $pick) {
-            $feeders = self::feederSlots($pick);
-            if ($feeders === []) {
-                continue;
-            }
-
-            $eligibleTeamIds = array_values(array_intersect_key($slots, array_flip($feeders)));
-            if (! in_array($pick['team_id'], $eligibleTeamIds, true)) {
-                throw new InvalidArgumentException('A later-round pick must have won its previous game.');
-            }
-        }
-    }
-
-    /** @param array{team_id:int, region:int, round:int, game:int, team:int} $pick */
-    private static function slotKey(array $pick): string
-    {
-        return $pick['region'] === 0
-            ? 'champion'
-            : implode('-', [$pick['region'], $pick['round'], $pick['game'], $pick['team']]);
-    }
-
-    /**
-     * @param array{team_id:int, region:int, round:int, game:int, team:int} $pick
-     * @return list<string>
-     */
-    private static function feederSlots(array $pick): array
-    {
-        if ($pick['region'] === 0) {
-            return ['3-5-1-1', '3-5-1-2'];
-        }
-
-        if ($pick['round'] === 1) {
-            return [];
-        }
-
-        if ($pick['round'] <= 4) {
-            $sourceGame = (($pick['game'] - 1) * 2) + $pick['team'];
-
-            return [
-                $pick['region'] . '-' . ($pick['round'] - 1) . '-' . $sourceGame . '-1',
-                $pick['region'] . '-' . ($pick['round'] - 1) . '-' . $sourceGame . '-2',
-            ];
-        }
-
-        if ($pick['region'] <= 2) {
-            $sourceRegion = (($pick['region'] - 1) * 2) + $pick['team'];
-
-            return [$sourceRegion . '-4-1-1', $sourceRegion . '-4-1-2'];
-        }
-
-        $sourceRegion = $pick['team'];
-
-        return [$sourceRegion . '-5-1-1', $sourceRegion . '-5-1-2'];
+        return ["{$region}-{$round}-{$game}-1", "{$region}-{$round}-{$game}-2"];
     }
 
     /**
@@ -146,9 +144,7 @@ final class BracketService
      */
     public static function teamsByRegion(array $teams): array
     {
-        $regions = ['south', 'west', 'east', 'midwest'];
-        $result = array_fill_keys($regions, []);
-
+        $result = array_fill_keys(self::REGIONS, []);
         foreach ($teams as $team) {
             $region = strtolower((string) ($team['region'] ?? ''));
             if (isset($result[$region])) {

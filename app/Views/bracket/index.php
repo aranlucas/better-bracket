@@ -1,10 +1,9 @@
 <?php declare(strict_types=1); ?>
 <?= view('layouts/header', ['title' => 'Make your picks', 'description' => 'Choose a winner for every tournament matchup.']) ?>
 <?php
-$regions = ['south', 'west', 'east', 'midwest'];
-$regionNumbers = array_flip($regions);
+$regions = \App\Services\BracketService::REGIONS;
 $roundLabels = [1 => 'Round of 64', 2 => 'Round of 32', 3 => 'Sweet 16', 4 => 'Elite 8'];
-$gamesByRound = [1 => 8, 2 => 4, 3 => 2, 4 => 1];
+$gamesByRound = \App\Services\BracketService::GAMES_BY_ROUND;
 ?>
 <section class="container page-heading compact-heading">
     <div><div class="eyebrow">Your tournament path</div><h1>Make your picks</h1><p class="lede">Tap a team to move it through the bracket. Your progress stays here until you save it.</p></div>
@@ -65,4 +64,5 @@ $gamesByRound = [1 => 8, 2 => 4, 3 => 2, 4 => 1];
         </div>
     </section>
 </section>
-<?= view('layouts/footer', ['scripts' => ['assets/js/bracket.js']]) ?>
+<script type="application/json" id="bracket-definition"><?= json_encode($definition, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+<?= view('layouts/footer', ['scripts' => ['assets/js/bracket-state.js', 'assets/js/bracket.js']]) ?>
