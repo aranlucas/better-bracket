@@ -1,0 +1,13 @@
+{
+  "name": "better-bracket-javascript-checks",
+  "private": true,
+  "scripts": {
+    "lint": "oxlint public/assets/js tests/browser/bracket.test.cjs tools/oxlint/verify-anti-slop.mjs",
+    "test:js": "node --test tests/browser/bracket.test.cjs",
+    "lint:plugin": "node tools/oxlint/verify-anti-slop.mjs"
+  },
+  "devDependencies": {
+    "oxlint": "1.86.0",
+    "@oxlint/plugins": "1.86.0"
+  }
+}

@@ -126,3 +126,6 @@ _modules/*
 
 /results/
 /phpunit.xml
+
+# Development-only JavaScript lint tooling
+node_modules/
