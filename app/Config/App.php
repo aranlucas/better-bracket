@@ -31,7 +31,8 @@ class App extends BaseConfig
     {
         parent::__construct();
 
-        $this->baseURL = rtrim(env('app.baseURL', $this->baseURL), '/') . '/';
+        // Portless sets PORTLESS_URL to the proxied local origin during `npm run dev`.
+        $this->baseURL = rtrim(env('PORTLESS_URL') ?: env('app.baseURL', $this->baseURL), '/') . '/';
         $this->appTimezone = env('app.appTimezone', $this->appTimezone);
         $this->forceGlobalSecureRequests = env('app.forceGlobalSecureRequests', false);
     }

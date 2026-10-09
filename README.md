@@ -44,41 +44,15 @@ Open [http://localhost:8080](http://localhost:8080). The database is initialized
 ```sh
 cp .env.example .env
 composer install
-php spark serve
+npm install
+npm run dev
 ```
+
+`npm run dev` runs `php spark serve` at `https://better-bracket.localhost` through [Portless](https://github.com/vercel-labs/portless) (a dev dependency; needs Node.js 24+); its first run may ask for `sudo` to bind port 443 and trust a local certificate.
 
 Create a PostgreSQL database, run `db.sql`, and set the `database.default.*` values in `.env`. The web server document root must be the `public/` directory; do not expose `app/`, `writable/`, or `vendor/` directly.
 
 For a migration-managed database, run `php spark migrate --all` followed by `php spark db:seed TournamentSeeder`. The seeder is idempotent and preserves the included historical tournament dataset.
-
-
-## Local URLs with Portless
-
-Complete the PHP, Composer, PostgreSQL, and `.env` setup above first. The command
-starts CodeIgniter's loopback development server on the assigned port and sets
-`app.baseURL` to the actual Portless URL for this process, including worktrees.
-
-The standard development command uses [Portless](https://github.com/vercel-labs/portless).
-Install its pinned CLI once with Node.js 24 or newer, then run this repository's command after the
-normal dependency and environment setup:
-
-```sh
-npm install -g portless@0.15.7
-composer dev
-```
-
-The main checkout uses `https://better-bracket.localhost` with the default proxy settings.
-Use the URL printed by Portless if you have changed its proxy port, TLS, or TLD.
-Linked Git worktrees get a branch prefix, so each checkout has its own origin.
-The first HTTPS run can request local administrator permission to bind port 443,
-trust its development certificate, and synchronize local hostnames. Ctrl+C stops
-the child server and removes its route.
-
-Docker Compose keeps its normal published ports. To browse an already running Docker app, run
-`portless proxy start` followed by `portless alias better-bracket-docker 8080`;
-remove that persistent alias afterward with
-`portless alias --remove better-bracket-docker`. Configure the Docker app's
-`app.baseURL` to match its alias before testing redirects.
 
 ## Checks
 
