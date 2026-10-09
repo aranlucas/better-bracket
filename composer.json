@@ -47,6 +47,8 @@
         "analyse": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --testdox",
         "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;",
-        "test:browser": "node --test tests/browser/*.test.cjs"
+        "test:browser": "node --test tests/browser/*.test.cjs",
+        "dev": "portless run --name better-bracket sh -c 'exec env \"app.baseURL=$PORTLESS_URL/\" php spark serve --host 127.0.0.1 --port \"$PORT\"'",
+        "dev:direct": "php spark serve"
     }
 }
