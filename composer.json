@@ -1,54 +1,53 @@
 {
-    "name": "aranlucas/better-bracket",
-    "description": "A modern tournament bracket and group manager.",
-    "type": "project",
-    "license": "MIT",
-    "require": {
-        "php": "^8.5",
-        "codeigniter4/framework": "^4.7"
-    },
-    "require-dev": {
-        "fakerphp/faker": "^1.24",
-        "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^13.3"
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\": "app/",
-            "Config\\": "app/Config/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\Support\\": "tests/_support/"
-        }
-    },
-    "config": {
-        "optimize-autoloader": true,
-        "platform-check": true,
-        "policy": {
-            "abandoned": {
-                "audit": "fail",
-                "block": true
-            }
-        },
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "scripts": {
-        "check": [
-            "@lint",
-            "@analyse",
-            "@test",
-            "@test:browser",
-            "@composer validate --strict",
-            "@composer audit --locked"
-        ],
-        "analyse": "phpstan analyse --memory-limit=512M",
-        "test": "phpunit --testdox",
-        "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;",
-        "test:browser": "node --test tests/browser/*.test.cjs",
-        "dev": "portless run --name better-bracket sh -c 'exec env \"app.baseURL=$PORTLESS_URL/\" php spark serve --host 127.0.0.1 --port \"$PORT\"'",
-        "dev:direct": "php spark serve"
+  "name": "aranlucas/better-bracket",
+  "description": "A modern tournament bracket and group manager.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": "^8.5",
+    "codeigniter4/framework": "^4.7"
+  },
+  "require-dev": {
+    "fakerphp/faker": "^1.24",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^13.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Config\\": "app/Config/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Support\\": "tests/_support/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform-check": true,
+    "policy": {
+      "abandoned": {
+        "audit": "fail",
+        "block": true
+      }
+    },
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "scripts": {
+    "check": [
+      "@lint",
+      "@analyse",
+      "@test",
+      "@test:browser",
+      "@composer validate --strict",
+      "@composer audit --locked"
+    ],
+    "analyse": "phpstan analyse --memory-limit=512M",
+    "test": "phpunit --testdox",
+    "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;",
+    "test:browser": "node --test tests/browser/*.test.cjs",
+    "dev": "portless run --name better-bracket sh -c 'exec env \"app.baseURL=$PORTLESS_URL/\" php spark serve --host 127.0.0.1 --port \"$PORT\"'"
+  }
 }

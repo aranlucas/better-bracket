@@ -72,11 +72,9 @@ Use the URL printed by Portless if you have changed its proxy port, TLS, or TLD.
 Linked Git worktrees get a branch prefix, so each checkout has its own origin.
 The first HTTPS run can request local administrator permission to bind port 443,
 trust its development certificate, and synchronize local hostnames. Ctrl+C stops
-the child server and removes its route. The direct fallback below starts the
-server without the proxy.
+the child server and removes its route.
 
-Use `composer dev:direct` for the original `php spark serve` workflow. Docker Compose keeps its
-normal published ports. To browse an already running Docker app, run
+Docker Compose keeps its normal published ports. To browse an already running Docker app, run
 `portless proxy start` followed by `portless alias better-bracket-docker 8080`;
 remove that persistent alias afterward with
 `portless alias --remove better-bracket-docker`. Configure the Docker app's
