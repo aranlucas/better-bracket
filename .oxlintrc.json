@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "extends": ["./node_modules/@aranlucas/oxforge/configs/recommended.json"],
+  "jsPlugins": [{ "name": "anti-slop", "specifier": "@aranlucas/oxlint-plugin-anti-slop" }],
   "rules": {
     "oxc/no-accumulating-spread": "error",
     "eslint/curly": "off",
@@ -24,7 +25,6 @@
     "typescript/no-non-null-assertion": "off",
     "eslint/radix": "off",
     "anti-slop/no-array-filter-map": "off",
-    "anti-slop/no-chained-type-assertions": "off",
     "anti-slop/no-conditional-empty-object-spread": "off",
     "anti-slop/no-known-value-widening": "off",
     "anti-slop/no-module-mocking": "off",
