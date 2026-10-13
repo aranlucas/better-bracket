@@ -1,12 +1,12 @@
 (function () {
     'use strict';
 
-    var toggle = document.querySelector('.nav-toggle');
-    var nav = document.querySelector('.main-nav');
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.main-nav');
 
     if (toggle && nav) {
         toggle.addEventListener('click', function () {
-            var open = nav.classList.toggle('is-open');
+            const open = nav.classList.toggle('is-open');
             toggle.setAttribute('aria-expanded', String(open));
         });
     }

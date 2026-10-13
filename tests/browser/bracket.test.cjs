@@ -89,7 +89,7 @@ function browser() {
                 querySelector: selector => selector === '.seed' ? seed : name,
                 addEventListener(event, handler) { this[event] = handler; },
                 classList: { add: value => classes.add(value), remove: value => classes.delete(value),
-                    toggle(value, active) { if (active) classes.add(value); else classes.delete(value); } }
+                    toggle(value, active) { if (active) {classes.add(value);} else {classes.delete(value);} } }
             };
         });
 
@@ -107,9 +107,9 @@ function browser() {
         const exact = selector.match(/^\[data-slot="([^"]+)"\]$/);
         const prefix = selector.match(/^\[data-slot\^="([^"]+)"\]$/);
 
-        if (exact) return buttons.filter(button => button.dataset.slot === exact[1]);
+        if (exact) {return buttons.filter(button => button.dataset.slot === exact[1]);}
 
-        if (prefix) return buttons.filter(button => button.dataset.slot.startsWith(prefix[1]));
+        if (prefix) {return buttons.filter(button => button.dataset.slot.startsWith(prefix[1]));}
 
         return selector === '.team-choice, .champion-choice' ? buttons : [];
     }
@@ -129,7 +129,7 @@ function browser() {
         buttons, status, button: slot => buttons.find(button => button.dataset.slot === slot),
         click(slot) { const button = this.button(slot);
 
- if (!button.disabled) button.click(); },
+ if (!button.disabled) {button.click();} },
         submit() { form.submit({ preventDefault() {} });
 
  return submitted; }
@@ -140,7 +140,7 @@ test('full championship selection, repeated clicks and save work with a seedless
     const page = browser();
 
     for (const [slot, entry] of Object.entries(definition)) {
-        if (entry.team === 1) page.click(slot);
+        if (entry.team === 1) {page.click(slot);}
     }
 
     page.click('champion');
