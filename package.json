@@ -8,8 +8,8 @@
     "dev": "portless run --app-port 8080 php spark serve"
   },
   "devDependencies": {
+    "@aranlucas/oxlint-plugin-anti-slop": "0.1.0",
     "oxlint": "1.86.0",
-    "@oxlint/plugins": "1.86.0",
     "portless": "0.15.7"
   }
 }
