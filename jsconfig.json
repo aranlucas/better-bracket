@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "noEmit": true,
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@assets/*": ["./public/assets/*"],
+      "@test/*": ["./test/*"]
+    }
+  },
+  "include": ["public/assets/js", "test", "vitest.config.mjs"]
+}

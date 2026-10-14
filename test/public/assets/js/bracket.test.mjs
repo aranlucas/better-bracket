@@ -12,7 +12,7 @@ import { test } from "vitest";
 
 import vm from "node:vm";
 
-import state from "../../../../public/assets/js/bracket-state.js";
+import state from "@assets/js/bracket-state.js";
 
 const root = resolve(import.meta.dirname, "../../../..");
 
