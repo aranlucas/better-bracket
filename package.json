@@ -2,17 +2,15 @@
   "name": "better-bracket",
   "private": true,
   "scripts": {
-    "lint": "oxlint public/assets/js test/public/assets/js/bracket.test.mjs test/tools/oxlint/anti-slop.test.mjs vitest.config.mjs",
+    "lint": "oxlint public/assets/js test/public/assets/js/bracket.test.mjs vitest.config.mjs",
     "test:js": "vitest run test/public/assets/js/bracket.test.mjs",
-    "lint:plugin": "vitest run test/tools/oxlint/anti-slop.test.mjs",
     "dev": "portless run --app-port 8080 php spark serve",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write",
     "format:check": "oxfmt --check"
   },
   "devDependencies": {
-    "@aranlucas/oxforge": "^0.1.3",
-    "@aranlucas/oxlint-plugin-anti-slop": "0.1.0",
+    "@aranlucas/oxforge": "^0.2.0",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "oxlint-tsgolint": "^7.0.2004",
