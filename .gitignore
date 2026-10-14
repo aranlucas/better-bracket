@@ -78,7 +78,7 @@ php_errors.log
 #-------------------------
 # Test Files
 #-------------------------
-/tests/coverage*
+/test/coverage*
 
 # Don't save phpunit under version control.
 /phpunit
