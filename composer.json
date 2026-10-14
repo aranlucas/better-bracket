@@ -20,7 +20,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Support\\": "tests/_support/"
+            "Tests\\Support\\": "test/_support/"
         }
     },
     "config": {
@@ -46,7 +46,7 @@
         ],
         "analyse": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --testdox",
-        "lint": "find app public tests -type f -name '*.php' -exec php -l {} \\;",
-        "test:browser": "node --test tests/browser/*.test.cjs"
+        "lint": "find app public test -type f -name '*.php' -exec php -l {} \\;",
+        "test:browser": "npm run test:js"
     }
 }

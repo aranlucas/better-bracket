@@ -2,9 +2,9 @@
   "name": "better-bracket",
   "private": true,
   "scripts": {
-    "lint": "oxlint public/assets/js tests/browser/bracket.test.mjs tools/oxlint/verify-anti-slop.mjs",
-    "test:js": "vitest run tests/browser/bracket.test.mjs",
-    "lint:plugin": "node tools/oxlint/verify-anti-slop.mjs",
+    "lint": "oxlint public/assets/js test/public/assets/js/bracket.test.mjs test/tools/oxlint/anti-slop.test.mjs",
+    "test:js": "vitest run test/public/assets/js/bracket.test.mjs",
+    "lint:plugin": "vitest run test/tools/oxlint/anti-slop.test.mjs",
     "dev": "portless run --app-port 8080 php spark serve",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write",

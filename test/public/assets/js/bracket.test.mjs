@@ -12,11 +12,11 @@ import { test } from "vitest";
 
 import vm from "node:vm";
 
-import state from "../../public/assets/js/bracket-state.js";
+import state from "../../../../public/assets/js/bracket-state.js";
 
-const root = resolve(import.meta.dirname, "../..");
+const root = resolve(import.meta.dirname, "../../../..");
 
-const fixture = resolve(root, "tests/fixtures/bracket.php");
+const fixture = resolve(root, "test/fixtures/bracket.php");
 
 const html = execFileSync(process.env.PHP_BINARY || "php", [fixture], { encoding: "utf8" });
 

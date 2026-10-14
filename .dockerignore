@@ -5,5 +5,5 @@ writable/cache
 writable/debugbar
 writable/logs
 writable/session
-tests
+test
 README.md

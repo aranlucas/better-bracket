@@ -2,7 +2,7 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-    bootstrap="vendor/codeigniter4/framework/system/Test/bootstrap.php"
+    bootstrap="test/bootstrap.php"
     backupGlobals="false"
     beStrictAboutOutputDuringTests="true"
     colors="true"
@@ -13,7 +13,7 @@
 >
     <testsuites>
         <testsuite name="App">
-            <directory>./tests</directory>
+            <directory suffix=".test.php">./test</directory>
         </testsuite>
     </testsuites>
 
