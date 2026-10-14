@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "lint": "oxlint public/assets/js tests/browser/bracket.test.mjs tools/oxlint/verify-anti-slop.mjs",
-    "test:js": "node --test tests/browser/bracket.test.mjs",
+    "test:js": "vitest run tests/browser/bracket.test.mjs",
     "lint:plugin": "node tools/oxlint/verify-anti-slop.mjs",
     "dev": "portless run --app-port 8080 php spark serve",
     "lint:fix": "oxlint --fix",
@@ -16,6 +16,7 @@
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "oxlint-tsgolint": "^7.0.2004",
-    "portless": "0.15.7"
+    "portless": "0.15.7",
+    "vitest": "5.0.3"
   }
 }

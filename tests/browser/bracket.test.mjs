@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 
 import { resolve } from "node:path";
 
-import { test } from "node:test";
+import { test } from "vitest";
 
 import vm from "node:vm";
 
