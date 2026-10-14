@@ -102,8 +102,11 @@ function browser() {
         add: (value) => classes.add(value),
         remove: (value) => classes.delete(value),
         toggle(value, active) {
-          if (active) classes.add(value);
-          else classes.delete(value);
+          if (active) {
+            classes.add(value);
+          } else {
+            classes.delete(value);
+          }
         },
       },
     };
@@ -132,9 +135,13 @@ function browser() {
     const exact = selector.match(/^\[data-slot="([^"]+)"\]$/);
     const prefix = selector.match(/^\[data-slot\^="([^"]+)"\]$/);
 
-    if (exact) return buttons.filter((button) => button.dataset.slot === exact[1]);
+    if (exact) {
+      return buttons.filter((button) => button.dataset.slot === exact[1]);
+    }
 
-    if (prefix) return buttons.filter((button) => button.dataset.slot.startsWith(prefix[1]));
+    if (prefix) {
+      return buttons.filter((button) => button.dataset.slot.startsWith(prefix[1]));
+    }
 
     return selector === ".team-choice, .champion-choice" ? buttons : [];
   }
@@ -166,7 +173,9 @@ function browser() {
     click(slot) {
       const button = this.button(slot);
 
-      if (!button.disabled) button.click();
+      if (!button.disabled) {
+        button.click();
+      }
     },
     submit() {
       form.submit({ preventDefault() {} });
@@ -180,7 +189,9 @@ test("full championship selection, repeated clicks and save work with a seedless
   const page = browser();
 
   for (const [slot, entry] of Object.entries(definition)) {
-    if (entry.team === 1) page.click(slot);
+    if (entry.team === 1) {
+      page.click(slot);
+    }
   }
 
   page.click("champion");
@@ -195,7 +206,11 @@ test("full championship selection, repeated clicks and save work with a seedless
 
 test("changing an early winner clears intermediate rounds before any champion is chosen", () => {
   const page = browser();
-  for (const slot of path.slice(0, 4)) page.click(slot);
+
+  for (const slot of path.slice(0, 4)) {
+    page.click(slot);
+  }
+
   page.click("1-1-1-2");
   assert.equal(page.button("1-3-1-1").disabled, true);
   assert.equal(page.button("1-4-1-1").disabled, true);
@@ -205,7 +220,11 @@ test("changing an early winner clears intermediate rounds before any champion is
 
 test("browser clears stale selections, names, enabled slots and saved picks after an upset", () => {
   const page = browser();
-  for (const slot of path) page.click(slot);
+
+  for (const slot of path) {
+    page.click(slot);
+  }
+
   page.click("1-1-1-2");
   assert.equal(page.button("1-2-1-1").dataset.teamId, "16");
 
@@ -220,7 +239,11 @@ test("browser clears stale selections, names, enabled slots and saved picks afte
     "Make it all the way",
   );
   assert.deepEqual(page.submit(), { "1-1-1-2": 16 });
-  for (const slot of path.slice(1)) page.click(slot);
+
+  for (const slot of path.slice(1)) {
+    page.click(slot);
+  }
+
   assert.equal(page.button("champion").querySelector(".team-name").textContent, "south 16");
   assert.equal(validate(page.submit()).length, 7);
 });

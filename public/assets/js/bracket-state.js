@@ -4,12 +4,18 @@
   function teamFor(definition, picks, slot) {
     const entry = definition[slot];
 
-    if (!entry) return null;
+    if (!entry) {
+      return null;
+    }
 
-    if (!entry.feeders.length) return entry.team_id;
+    if (!entry.feeders.length) {
+      return entry.team_id;
+    }
 
     for (const feeder of entry.feeders) {
-      if (picks[feeder]) return picks[feeder];
+      if (picks[feeder]) {
+        return picks[feeder];
+      }
     }
 
     return null;
@@ -21,7 +27,9 @@
     const entry = definition[slot];
     const team = teamFor(definition, picks, slot);
 
-    if (!entry || !team) return next;
+    if (!entry || !team) {
+      return next;
+    }
 
     for (const selected of Object.keys(next)) {
       const other = definition[selected];
@@ -33,6 +41,7 @@
         delete next[selected];
       }
     }
+
     next[slot] = team;
 
     // Iterate to a fixed point so invalid descendants disappear even if the
@@ -41,6 +50,7 @@
 
     do {
       changed = false;
+
       for (const selected of Object.keys(next)) {
         if (teamFor(definition, next, selected) !== next[selected]) {
           delete next[selected];
@@ -54,6 +64,9 @@
 
   const state = { teamFor: teamFor, chooseWinner: chooseWinner };
 
-  if (typeof module !== "undefined" && module.exports) module.exports = state;
-  else root.BracketState = state;
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = state;
+  } else {
+    root.BracketState = state;
+  }
 })(typeof globalThis !== "undefined" ? globalThis : this);

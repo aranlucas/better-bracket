@@ -3,7 +3,9 @@
 
   const form = document.querySelector("#bracket-form");
 
-  if (!form) return;
+  if (!form) {
+    return;
+  }
 
   let picks = {};
   const status = document.querySelector("#bracket-status");
@@ -11,7 +13,10 @@
 
   const definitionElement = document.querySelector("#bracket-definition");
 
-  if (!definitionElement) return;
+  if (!definitionElement) {
+    return;
+  }
+
   const definition = JSON.parse(definitionElement.textContent);
   const state = window.BracketState;
   const buttons = document.querySelectorAll(".team-choice, .champion-choice");
@@ -40,14 +45,20 @@
       button.classList.toggle("is-selected", picks[slot] === teamId && !!details);
       const seed = button.querySelector(".seed");
 
-      if (seed) seed.textContent = details ? details.seed : "";
+      if (seed) {
+        seed.textContent = details ? details.seed : "";
+      }
+
       button.querySelector(".team-name").textContent = details ? details.name : placeholders[slot];
     }
   }
 
   function bindButton(button) {
     button.addEventListener("click", function () {
-      if (!button.dataset.teamId) return;
+      if (!button.dataset.teamId) {
+        return;
+      }
+
       const slot = button.dataset.slot;
       picks = state.chooseWinner(definition, picks, slot);
       render();
@@ -64,14 +75,18 @@
     });
   }
 
-  for (const button of buttons) bindButton(button);
+  for (const button of buttons) {
+    bindButton(button);
+  }
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     const group = document.querySelector("#bracket-group");
 
     if (!group || !group.value) {
-      if (status) status.textContent = "Choose a group before saving your picks.";
+      if (status) {
+        status.textContent = "Choose a group before saving your picks.";
+      }
 
       return;
     }
@@ -81,7 +96,9 @@
     body.set("picks", JSON.stringify(picks));
     body.set("csrf_token", form.dataset.csrfToken);
 
-    if (status) status.textContent = "Saving your picks…";
+    if (status) {
+      status.textContent = "Saving your picks…";
+    }
 
     fetch(form.action, {
       method: "POST",
@@ -94,20 +111,28 @@
         });
       })
       .then(function (result) {
-        if (!result.ok || !result.data.ok)
+        if (!result.ok || !result.data.ok) {
           throw new Error(result.data.error || "Picks could not be saved.");
+        }
 
-        if (result.data.csrfHash && csrfToken)
+        if (result.data.csrfHash && csrfToken) {
           csrfToken.setAttribute("content", result.data.csrfHash);
+        }
 
-        if (result.data.csrfHash) form.dataset.csrfToken = result.data.csrfHash;
+        if (result.data.csrfHash) {
+          form.dataset.csrfToken = result.data.csrfHash;
+        }
 
-        if (status) status.textContent = result.data.message;
+        if (status) {
+          status.textContent = result.data.message;
+        }
 
         return result.data;
       })
       .catch(function (error) {
-        if (status) status.textContent = error.message;
+        if (status) {
+          status.textContent = error.message;
+        }
       });
   });
 })();
