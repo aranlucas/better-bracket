@@ -2,6 +2,7 @@
   "name": "better-bracket",
   "private": true,
   "scripts": {
+    "prepare": "husky",
     "lint": "oxlint public/assets/js test/public/assets/js/bracket.test.mjs vitest.config.mjs",
     "test:js": "vitest run test/public/assets/js/bracket.test.mjs",
     "dev": "portless run --app-port 8080 php spark serve",
@@ -11,10 +12,21 @@
   },
   "devDependencies": {
     "@aranlucas/oxforge": "^0.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "oxlint-tsgolint": "^7.0.2004",
     "portless": "0.15.7",
     "vitest": "5.0.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}": [
+      "oxlint --fix",
+      "oxfmt --no-error-on-unmatched-pattern"
+    ],
+    "*.{json,jsonc,json5,css,scss,md,mdx,yml,yaml,html,toml,vue,svelte,astro,graphql}": [
+      "oxfmt --no-error-on-unmatched-pattern"
+    ]
   }
 }
