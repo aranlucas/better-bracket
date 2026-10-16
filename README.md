@@ -7,8 +7,7 @@
 
 ![Illustrated tournament bracket bringing a group of picks together](docs/images/readme-cover.png)
 
-*Concept artwork for tournament night; it is not an application screenshot.*
-
+_Concept artwork for tournament night; it is not an application screenshot._
 
 **Make your picks. Bring your group. See who called it.**
 
@@ -44,11 +43,11 @@ Open [http://localhost:8080](http://localhost:8080). The database is initialized
 ```sh
 cp .env.example .env
 composer install
-npm install
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
-`npm run dev` runs `php spark serve` at `https://better-bracket.localhost` through [Portless](https://github.com/vercel-labs/portless) (a dev dependency; needs Node.js 24+); its first run may ask for `sudo` to bind port 443 and trust a local certificate.
+`pnpm run dev` runs `php spark serve` at `https://better-bracket.localhost` through [Portless](https://github.com/vercel-labs/portless) (a dev dependency; needs Node.js 24+); its first run may ask for `sudo` to bind port 443 and trust a local certificate.
 
 Create a PostgreSQL database, run `db.sql`, and set the `database.default.*` values in `.env`. The web server document root must be the `public/` directory; do not expose `app/`, `writable/`, or `vendor/` directly.
 
