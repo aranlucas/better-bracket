@@ -8,7 +8,9 @@
     "dev": "portless run --app-port 8080 php spark serve",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "build": "docker build --tag better-bracket:ci .",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@aranlucas/oxforge": "^0.2.2",
