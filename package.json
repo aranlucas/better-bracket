@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-    "lint": "oxlint public/assets/js test/public/assets/js/bracket.test.mjs vitest.config.mjs",
-    "test:js": "vitest run test/public/assets/js/bracket.test.mjs",
+    "lint": "oxlint public/assets/js test vitest.config.mjs",
+    "test:js": "vitest run",
     "dev": "portless run --app-port 8080 php spark serve",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write",
