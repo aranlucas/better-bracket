@@ -46,7 +46,7 @@
         ],
         "analyse": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --testdox",
-        "lint": "find app public test -type f -name '*.php' -exec php -l {} \\;",
+        "lint": "find app public test -type f -name '*.php' -exec php -l {} +",
         "test:browser": "npm run test:js"
     }
 }
