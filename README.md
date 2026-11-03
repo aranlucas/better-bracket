@@ -40,7 +40,7 @@ pnpm run lint
 pnpm run format:check
 ```
 
-Install development dependencies first. PHP tests also require `sqlite3` and use an isolated in-memory database. `composer check` includes the JavaScript tests and a dependency audit that needs network access.
+Install development dependencies first. PHP tests also require `sqlite3` and use an isolated in-memory database. `composer check` includes the JavaScript tests and strict Composer validation.
 
 ## Deployment
 
