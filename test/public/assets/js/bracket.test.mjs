@@ -99,8 +99,6 @@ function browser() {
         this[event] = handler;
       },
       classList: {
-        add: (value) => classes.add(value),
-        remove: (value) => classes.delete(value),
         toggle(value, active) {
           if (active) {
             classes.add(value);
@@ -131,28 +129,14 @@ function browser() {
 
   let submitted;
 
-  function select(selector) {
-    const exact = selector.match(/^\[data-slot="([^"]+)"\]$/);
-    const prefix = selector.match(/^\[data-slot\^="([^"]+)"\]$/);
-
-    if (exact) {
-      return buttons.filter((button) => button.dataset.slot === exact[1]);
-    }
-
-    if (prefix) {
-      return buttons.filter((button) => button.dataset.slot.startsWith(prefix[1]));
-    }
-
-    return selector === ".team-choice, .champion-choice" ? buttons : [];
-  }
-
   const context = {
     window: { BracketState: state },
     URLSearchParams,
     document: {
       querySelector: (selector) =>
-        selector.startsWith("#") ? ids[selector.slice(1)] || null : select(selector)[0] || null,
-      querySelectorAll: select,
+        selector.startsWith("#") ? ids[selector.slice(1)] || null : null,
+      querySelectorAll: (selector) =>
+        selector === ".team-choice, .champion-choice" ? buttons : [],
     },
     fetch(url, options) {
       submitted = JSON.parse(options.body.get("picks"));
@@ -167,7 +151,6 @@ function browser() {
   vm.runInNewContext(readFileSync(resolve(root, "public/assets/js/bracket.js"), "utf8"), context);
 
   return {
-    buttons,
     status,
     button: (slot) => buttons.find((button) => button.dataset.slot === slot),
     click(slot) {
