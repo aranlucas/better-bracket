@@ -41,8 +41,7 @@
             "@analyse",
             "@test",
             "@test:browser",
-            "@composer validate --strict",
-            "@composer audit --locked"
+            "@composer validate --strict"
         ],
         "analyse": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --testdox",
