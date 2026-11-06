@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Models\GroupModel;
+use App\Models\GameModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class Games extends BaseController
@@ -17,7 +17,7 @@ class Games extends BaseController
 
         return view('games/index', [
             'title' => 'Past games',
-            'games' => (new GroupModel())->pastGames(),
+            'games' => (new GameModel())->pastGames(),
         ]);
     }
 }

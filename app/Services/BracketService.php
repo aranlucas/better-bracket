@@ -27,7 +27,6 @@ final class BracketService
     ];
 
     /**
-     * The legal slots and their inputs, shared by validation and browser transitions.
      * Champion is the existing optional confirmation of the championship winner.
      *
      * @param list<array<string, mixed>> $teams
@@ -76,7 +75,6 @@ final class BracketService
     }
 
     /**
-     * Validate the complete selection before returning rows suitable for persistence.
      * Partial brackets are allowed, but every pick must have a legal path from its seed.
      *
      * @param array<string, mixed> $picks
@@ -136,22 +134,5 @@ final class BracketService
     private static function gameSlots(int $region, int $round, int $game): array
     {
         return ["{$region}-{$round}-{$game}-1", "{$region}-{$round}-{$game}-2"];
-    }
-
-    /**
-     * @param list<array<string, mixed>> $teams
-     * @return array<string, list<array<string, mixed>>>
-     */
-    public static function teamsByRegion(array $teams): array
-    {
-        $result = array_fill_keys(self::REGIONS, []);
-        foreach ($teams as $team) {
-            $region = strtolower((string) ($team['region'] ?? ''));
-            if (isset($result[$region])) {
-                $result[$region][] = $team;
-            }
-        }
-
-        return $result;
     }
 }

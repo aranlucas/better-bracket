@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\BracketModel;
 use App\Models\GroupModel;
 use App\Services\BracketService;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -20,12 +21,12 @@ class Bracket extends BaseController
 
         $groupModel = new GroupModel();
 
-        $teams = $groupModel->bracketTeams();
+        $teams = (new BracketModel())->bracketTeams();
 
         return view('bracket/index', [
             'title'  => 'Make your picks',
             'groups' => $groupModel->forUser($userId),
-            'teams'  => BracketService::teamsByRegion($teams),
+            'teams'  => array_column($teams, null, 'id'),
             'definition' => BracketService::definition($teams),
         ]);
     }
@@ -57,13 +58,14 @@ class Bracket extends BaseController
             return $this->json(['ok' => false, 'error' => 'You must be a member of that group.'], 403);
         }
 
+        $bracketModel = new BracketModel();
         try {
-            $normalized = BracketService::validatePicks($picks, $groupModel->bracketTeams());
+            $normalized = BracketService::validatePicks($picks, $bracketModel->bracketTeams());
         } catch (InvalidArgumentException $exception) {
             return $this->json(['ok' => false, 'error' => $exception->getMessage()], 422);
         }
 
-        if (! $groupModel->savePicks($groupId, $userId, $normalized)) {
+        if (! $bracketModel->savePicks($groupId, $userId, $normalized)) {
             return $this->json(['ok' => false, 'error' => 'Your picks could not be saved.'], 500);
         }
 

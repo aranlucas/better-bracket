@@ -83,7 +83,6 @@ final class BracketServiceTest extends TestCase
             }
             $picks[$slot] = $entry['team_id'] ?? $picks[$entry['feeders'][0]];
         }
-        // Selection order does not change eligibility.
         self::assertCount(64, BracketService::validatePicks(array_reverse($picks, true), self::teams()));
         unset($picks['champion']);
         self::assertCount(63, BracketService::validatePicks($picks, self::teams()));
@@ -97,13 +96,4 @@ final class BracketServiceTest extends TestCase
         BracketService::validatePicks($picks, self::teams());
     }
 
-    public function testGroupsTeamsByKnownRegion(): void
-    {
-        $regions = BracketService::teamsByRegion([
-            ['region' => 'south', 'id' => 1], ['region' => 'WEST', 'id' => 2], ['region' => 'unknown', 'id' => 3],
-        ]);
-        self::assertSame([['region' => 'south', 'id' => 1]], $regions['south']);
-        self::assertSame([['region' => 'WEST', 'id' => 2]], $regions['west']);
-        self::assertSame([], $regions['east']);
-    }
 }

@@ -20,10 +20,6 @@ $gamesByRound = \App\Services\BracketService::GAMES_BY_ROUND;
     <?php foreach ($regions as $regionIndex => $region): ?>
         <?php
         $regionNumber = $regionIndex + 1;
-        $teamBySeed = [];
-        foreach ($teams[$region] as $team) {
-            $teamBySeed[(int) $team['seed']] = $team;
-        }
         ?>
         <section class="bracket-region" aria-labelledby="region-<?= $regionNumber ?>">
             <div class="bracket-region-heading"><span class="region-number">0<?= $regionNumber ?></span><h2 id="region-<?= $regionNumber ?>"><?= e(ucfirst($region)) ?></h2></div>
@@ -36,12 +32,8 @@ $gamesByRound = \App\Services\BracketService::GAMES_BY_ROUND;
                                 <div class="bracket-game" data-region="<?= $regionNumber ?>" data-round="<?= $round ?>" data-game="<?= $game ?>">
                                     <?php for ($slot = 1; $slot <= 2; $slot++): ?>
                                         <?php
-                                        $team = null;
-                                        if ($round === 1) {
-                                            $seed = (int) \App\Services\BracketService::OPENING_MATCHUPS[$game - 1][$slot];
-                                            $team = $teamBySeed[$seed] ?? null;
-                                        }
                                         $slotId = $regionNumber . '-' . $round . '-' . $game . '-' . $slot;
+                                        $team = $teams[$definition[$slotId]['team_id']] ?? null;
                                         ?>
                                         <button type="button" class="team-choice" data-slot="<?= e($slotId) ?>" data-team-id="<?= $team ? (int) $team['id'] : '' ?>" <?= $team ? '' : 'disabled' ?>>
                                             <span class="seed"><?= $team ? (int) $team['seed'] : '' ?></span><span class="team-name"><?= $team ? e($team['team_name']) : 'Winner advances here' ?></span>

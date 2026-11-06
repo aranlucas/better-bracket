@@ -21,7 +21,6 @@
     return null;
   }
 
-  // State is a slot-to-winner map. The server definition owns all topology.
   function chooseWinner(definition, picks, slot) {
     const next = Object.assign({}, picks);
     const entry = definition[slot];
@@ -44,8 +43,6 @@
 
     next[slot] = team;
 
-    // Iterate to a fixed point so invalid descendants disappear even if the
-    // selected slots arrived in a different order (e.g. restored state).
     let changed;
 
     do {

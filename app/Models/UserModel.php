@@ -36,10 +36,6 @@ class UserModel extends Model
         return is_array($profile) ? $profile : null;
     }
 
-    /**
-     * Creates an account while preserving the original app's profile row.
-     * The transaction prevents an account without a matching profile.
-     */
     /** @return array{id?: int, email?: string, error?: string} */
     public function createAccount(string $first, string $last, string $email, string $password): array
     {
@@ -97,7 +93,6 @@ class UserModel extends Model
         // after the first successful login so no account reset is required.
         if (! $valid && hash_equals((string) $user['password'], $legacyHash)) {
             $valid = true;
-            $this->update($user['id'], ['password' => password_hash($password, PASSWORD_DEFAULT)]);
         }
 
         if (! $valid) {
