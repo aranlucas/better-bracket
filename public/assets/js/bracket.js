@@ -111,16 +111,25 @@
         });
       })
       .then(function (result) {
-        if (!result.ok || !result.data.ok) {
-          throw new Error(result.data.error || "Picks could not be saved.");
-        }
-
         if (result.data.csrfHash && csrfToken) {
           csrfToken.setAttribute("content", result.data.csrfHash);
         }
 
         if (result.data.csrfHash) {
           form.dataset.csrfToken = result.data.csrfHash;
+          const tokenField = form.querySelector('input[type="hidden"]');
+
+          if (tokenField) {
+            for (const field of document.querySelectorAll('input[type="hidden"]')) {
+              if (field.name === tokenField.name) {
+                field.value = result.data.csrfHash;
+              }
+            }
+          }
+        }
+
+        if (!result.ok || !result.data.ok) {
+          throw new Error(result.data.error || "Picks could not be saved.");
         }
 
         if (status) {

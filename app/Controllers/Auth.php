@@ -111,6 +111,6 @@ class Auth extends BaseController
     {
         $identity = $this->request->getIPAddress() . '|' . $email;
 
-        return service('throttler')->check($action . ':' . hash('sha256', $identity), $capacity, $seconds);
+        return service('throttler')->check($action . '_' . hash('sha256', $identity), $capacity, $seconds);
     }
 }

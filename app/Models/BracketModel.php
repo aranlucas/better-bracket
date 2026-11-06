@@ -25,6 +25,12 @@ class BracketModel extends Model
     {
         try {
             $this->db->transBegin();
+            // Lock the stable membership row even when the bracket has no picks.
+            // Query Builder's no-op update serializes replacement across sessions.
+            $this->db->table('user_groups')->where([
+                'group_id' => $groupId,
+                'user_id' => $userId,
+            ])->update(['group_id' => $groupId]);
             $this->db->table('picks')->where([
                 'group_id' => $groupId,
                 'user_id'  => $userId,
