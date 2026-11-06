@@ -129,3 +129,6 @@ _modules/*
 
 # Development-only JavaScript lint tooling
 node_modules/
+
+# End-to-end reports and traces
+.e2e/

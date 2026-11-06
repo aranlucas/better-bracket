@@ -8,6 +8,7 @@ use App\Models\BracketModel;
 use App\Models\GroupModel;
 use App\Services\BracketService;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\Exceptions\HTTPException;
 use InvalidArgumentException;
 
 class Bracket extends BaseController
@@ -38,9 +39,15 @@ class Bracket extends BaseController
             return $this->json(['ok' => false, 'error' => 'Please sign in again.'], 401);
         }
 
-        $payload = $this->request->getJSON(true);
+        try {
+            $payload = $this->request->is('json')
+                ? $this->request->getJSON(true)
+                : $this->request->getPost();
+        } catch (HTTPException) {
+            return $this->json(['ok' => false, 'error' => 'Send a valid JSON object.'], 422);
+        }
         if (! is_array($payload)) {
-            $payload = $this->request->getPost();
+            return $this->json(['ok' => false, 'error' => 'Send a valid picks object.'], 422);
         }
 
         $groupId = (int) ($payload['group_id'] ?? 0);
@@ -72,13 +79,12 @@ class Bracket extends BaseController
         return $this->json([
             'ok'       => true,
             'message'  => 'Picks saved.',
-            'csrfHash' => csrf_hash(),
         ]);
     }
 
     /** @param array<string, mixed> $data */
     private function json(array $data, int $status = 200): ResponseInterface
     {
-        return $this->response->setStatusCode($status)->setJSON($data);
+        return $this->response->setStatusCode($status)->setJSON($data + ['csrfHash' => csrf_hash()]);
     }
 }

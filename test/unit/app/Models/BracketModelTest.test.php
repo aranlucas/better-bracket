@@ -16,6 +16,8 @@ final class BracketModelTest extends CIUnitTestCase
             'DBDriver' => 'SQLite3', 'database' => ':memory:', 'DBPrefix' => '', 'DBDebug' => false,
         ], false);
         try {
+            $db->query('CREATE TABLE user_groups (group_id INTEGER, user_id INTEGER)');
+            $db->table('user_groups')->insert(['group_id' => 1, 'user_id' => 1]);
             $db->query('CREATE TABLE picks (user_id INTEGER, group_id INTEGER, team_id INTEGER CHECK (team_id > 0), region INTEGER, round INTEGER, game INTEGER, team INTEGER)');
             $original = ['user_id' => 1, 'group_id' => 1, 'team_id' => 8, 'region' => 1, 'round' => 1, 'game' => 2, 'team' => 1];
             $db->table('picks')->insert($original);

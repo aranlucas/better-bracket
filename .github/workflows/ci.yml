@@ -18,7 +18,30 @@ jobs:
   ci:
     if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: better_bracket
+          POSTGRES_USER: better_bracket
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U better_bracket"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      CI_ENVIRONMENT: development
+      app_baseURL: http://127.0.0.1:8080/
+      database_default_hostname: 127.0.0.1
+      database_default_username: better_bracket
+      database_default_password: ci-only-password
+      database_default_database: better_bracket
+      PGHOST: 127.0.0.1
+      PGUSER: better_bracket
+      PGPASSWORD: ci-only-password
+      PGDATABASE: better_bracket
+      E2E_TELEMETRY_DISABLED: "1"
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -73,3 +96,49 @@ jobs:
               # PRs only restore; pushes and manual runs populate the layer cache.
               cache-from: type=gha,scope=better-bracket
               cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,scope=better-bracket,mode=max,timeout=2m,ignore-error=true' || '' }}
+
+      - name: Initialize disposable browser fixtures
+        run: |
+          php spark migrate --all
+          php spark db:seed TournamentSeeder
+          pnpm exec e2e-web install chromium --with-deps
+
+      - name: Demonstrate pre-fix regressions independently
+        run: |
+          for file in app/Controllers/Auth.php app/Controllers/Bracket.php public/assets/js/bracket.js; do
+            cp "$file" /tmp/audit-fixed-source
+            git show 65fc7a9:"$file" > "$file"
+            set +e
+            pnpm exec e2e run --output ".e2e/baseline-$(basename "$file")"
+            result=$?
+            set -e
+            cp /tmp/audit-fixed-source "$file"
+            if [ "$result" -ne 1 ]; then
+              echo "Expected a failing regression for $file, got exit $result"
+              exit 1
+            fi
+          done
+
+      - name: Demonstrate pre-fix concurrent replacement regression
+        run: |
+          cp app/Models/BracketModel.php /tmp/audit-fixed-model
+          git show 65fc7a9:app/Models/BracketModel.php > app/Models/BracketModel.php
+          set +e
+          vendor/bin/phpunit --filter BracketConcurrencyTest
+          result=$?
+          set -e
+          cp /tmp/audit-fixed-model app/Models/BracketModel.php
+          test "$result" -eq 1
+
+      - name: Browser account and picks regression
+        run: pnpm exec e2e run
+
+      - name: Upload browser and PHP evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: reliability-evidence
+          path: |
+            .e2e/
+            build/logs/
+            writable/logs/
