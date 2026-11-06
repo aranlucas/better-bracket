@@ -32,3 +32,5 @@ Use published `e2e@0.23.0` and `@e2e-dev/web@0.15.5` (registry checked 2026-11-0
 ## Outcome
 
 Independent static review of `262b787` found no remaining substantive blockers. First CI run [42300022294](https://github.com/aranlucas/better-bracket/actions/runs/42300022294) passed PHP syntax/static analysis, existing behavior tests, JavaScript lint/tests and container build, but the new PostgreSQL subprocess fixture failed to connect because its explicit connection config omitted `charset`. Corrected the fixture to use UTF-8 and expose child-process diagnostics. Browser and pre-fix evidence were not reached; corrected CI pending. No tests/builds run locally.
+
+CI follow-up: [42300489262](https://github.com/aranlucas/better-bracket/actions/runs/42300489262) passed all PHP checks (including the PostgreSQL lock regression), JS lint/tests and container build. The baseline demonstration stopped before tests because shallow checkout omitted `65fc7a9`; checkout now fetches history. Browser and pre-fix evidence remain pending.
