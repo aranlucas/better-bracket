@@ -1,0 +1,10 @@
+-- Forty server EXPLAIN ANALYZE samples per source query.
+SET search_path TO scale_bench,public;
+
+-- app/Models/GroupModel.php#forUser
+SELECT $query$EXPLAIN (ANALYZE,BUFFERS,FORMAT JSON) SELECT g.id,g.name,g.date_created,gp.description,gp.caption FROM groups g JOIN user_groups ug ON ug.group_id=g.id LEFT JOIN groups_profile gp ON gp.group_id=g.id WHERE ug.user_id=1 ORDER BY g.date_created DESC;$query$ FROM generate_series(1,40)
+\gexec
+
+-- app/Models/GroupModel.php#members
+SELECT $query$EXPLAIN (ANALYZE,BUFFERS,FORMAT JSON) SELECT u.id,u.email,up.first,up.last FROM user_groups ug JOIN users u ON u.id=ug.user_id LEFT JOIN users_profile up ON up.user_id=u.id WHERE ug.group_id=1 ORDER BY up.first,up.last;$query$ FROM generate_series(1,40)
+\gexec
