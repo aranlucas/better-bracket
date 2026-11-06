@@ -47,7 +47,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 0
 
       - name: Set up PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
@@ -103,33 +102,6 @@ jobs:
           php spark migrate --all
           php spark db:seed TournamentSeeder
           pnpm exec e2e-web install chromium --with-deps
-
-      - name: Demonstrate pre-fix regressions independently
-        run: |
-          for file in app/Controllers/Auth.php app/Controllers/Bracket.php public/assets/js/bracket.js; do
-            cp "$file" /tmp/audit-fixed-source
-            git show 65fc7a9:"$file" > "$file"
-            set +e
-            pnpm exec e2e run --output ".e2e/baseline-$(basename "$file")"
-            result=$?
-            set -e
-            cp /tmp/audit-fixed-source "$file"
-            if [ "$result" -ne 1 ]; then
-              echo "Expected a failing regression for $file, got exit $result"
-              exit 1
-            fi
-          done
-
-      - name: Demonstrate pre-fix concurrent replacement regression
-        run: |
-          cp app/Models/BracketModel.php /tmp/audit-fixed-model
-          git show 65fc7a9:app/Models/BracketModel.php > app/Models/BracketModel.php
-          set +e
-          vendor/bin/phpunit --filter BracketConcurrencyTest
-          result=$?
-          set -e
-          cp /tmp/audit-fixed-model app/Models/BracketModel.php
-          test "$result" -eq 1
 
       - name: Browser account and picks regression
         run: pnpm exec e2e run

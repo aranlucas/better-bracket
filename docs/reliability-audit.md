@@ -36,3 +36,16 @@ Independent static review of `262b787` found no remaining substantive blockers. 
 CI follow-up: [42300489262](https://github.com/aranlucas/better-bracket/actions/runs/42300489262) passed all PHP checks (including the PostgreSQL lock regression), JS lint/tests and container build. The baseline demonstration stopped before tests because shallow checkout omitted `65fc7a9`; checkout now fetches history. Browser and pre-fix evidence remain pending.
 
 CI follow-up: [42300952202](https://github.com/aranlucas/better-bracket/actions/runs/42300952202) passed the fixed PHP/JS/build gates but the browser registration timed out. The e2e command environment is restricted by default (installed config guide); app URL/database variables were not inherited. Added an explicit allowlist for CI environment, app and database settings, and enabled hidden-file artifact upload for `.e2e/`. Baseline browser failures in this run are **not** accepted as defect evidence because they failed at this common setup issue. Corrected browser evidence pending.
+
+## Verified result
+
+[CI run 42301539226](https://github.com/aranlucas/better-bracket/actions/runs/42301539226) passed on `e2f1dc2`: 32 PHP tests / 52 assertions, 11 JavaScript tests, PHP syntax/static analysis, JavaScript lint and container build. The deterministic Chromium journey passed registration, group creation, form/JSON pick persistence, invalid-path rejection with unchanged rows, corrected retries, malformed JSON handling, logout and login. It used no model calls or external credentials.
+
+Downloaded and inspected `reliability-evidence` reports, traces and application logs. Isolated baseline substitutions reproduced the intended defects independently:
+
+- Auth: POST `/register` returned 500; trace displayed `Cache key contains reserved characters`, and dashboard navigation failed.
+- Bracket controller: registration/group creation succeeded, but the first real URL-encoded save returned 500 instead of 200.
+- Browser JS: save and validation rejection succeeded, but corrected retry returned 403 instead of 200 (stale CSRF).
+- Bracket model: the concurrent saver exited before waiting for the locked membership row; fixed model blocked then replaced the other transaction's rows, leaving only its submitted team.
+
+The temporary source-substitution CI steps and full-history checkout were removed after this evidence was captured. Maintained fixed-version browser, PostgreSQL concurrency, rollback and existing tests remain CI gates. Independent static review found no remaining substantive objections; test-only CI setup corrections are documented above. Merge waits for the final CI run on this evidence update. No deployment, production data changes or credential changes.
