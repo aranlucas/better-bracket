@@ -12,6 +12,7 @@ export default {
         command: {
           executable: "php",
           args: ["spark", "serve", "--host", "127.0.0.1", "--port", "8080"],
+          inheritEnv: ["CI_ENVIRONMENT", "app_*", "database_*"],
           log: ".e2e/logs/app.log",
         },
       },
