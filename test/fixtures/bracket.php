@@ -19,7 +19,7 @@ if (($argv[1] ?? '') === 'validate') {
     echo json_encode(BracketService::validatePicks($picks, $catalogue), JSON_THROW_ON_ERROR);
     exit;
 }
-$teams = BracketService::teamsByRegion($catalogue);
+$teams = array_column($catalogue, null, 'id');
 $groups = [['id' => 1, 'name' => 'Synthetic test group']];
 function view(string $name, array $data): string { return ''; }
 function e(mixed $value): string { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }

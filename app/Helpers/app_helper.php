@@ -12,7 +12,7 @@ if (! function_exists('e')) {
 if (! function_exists('is_authenticated')) {
     function is_authenticated(): bool
     {
-        return is_numeric(session()->get('user_id'));
+        return current_user_id() !== null;
     }
 }
 

@@ -13,7 +13,7 @@ class Groups extends BaseController
 {
     public function index(): string|ResponseInterface
     {
-        $userId = $this->authenticatedUser();
+        $userId = current_user_id();
         if ($userId === null) {
             return redirect()->to('/login');
         }
@@ -26,7 +26,7 @@ class Groups extends BaseController
 
     public function all(): string|ResponseInterface
     {
-        if ($this->authenticatedUser() === null) {
+        if (current_user_id() === null) {
             return redirect()->to('/login');
         }
 
@@ -38,7 +38,7 @@ class Groups extends BaseController
 
     public function createForm(): string|ResponseInterface
     {
-        if ($this->authenticatedUser() === null) {
+        if (current_user_id() === null) {
             return redirect()->to('/login');
         }
 
@@ -47,7 +47,7 @@ class Groups extends BaseController
 
     public function create(): ResponseInterface
     {
-        $userId = $this->authenticatedUser();
+        $userId = current_user_id();
         if ($userId === null) {
             return redirect()->to('/login');
         }
@@ -88,7 +88,7 @@ class Groups extends BaseController
 
     public function show(int $id): string|ResponseInterface
     {
-        if ($this->authenticatedUser() === null) {
+        if (current_user_id() === null) {
             return redirect()->to('/login');
         }
 
@@ -108,7 +108,7 @@ class Groups extends BaseController
 
     public function addMember(int $id): ResponseInterface
     {
-        $userId = $this->authenticatedUser();
+        $userId = current_user_id();
         if ($userId === null) {
             return redirect()->to('/login');
         }
@@ -122,7 +122,7 @@ class Groups extends BaseController
         if ($email === '') {
             $email = (string) session()->get('email');
         }
-        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (! $this->validateData(['email' => $email], ['email' => 'required|valid_email'])) {
             session()->setFlashdata('error', 'Enter a valid member email address.');
 
             return redirect()->to('/groups/' . $id);
@@ -156,12 +156,5 @@ class Groups extends BaseController
         session()->setFlashdata('success', 'Member added to the group.');
 
         return redirect()->to('/groups/' . $id);
-    }
-
-    private function authenticatedUser(): ?int
-    {
-        $userId = current_user_id();
-
-        return $userId;
     }
 }

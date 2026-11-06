@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Services\BracketService;
 use CodeIgniter\Model;
 use Throwable;
 
@@ -123,64 +122,4 @@ class GroupModel extends Model
         ]) !== false;
     }
 
-    /** @return list<array<string, mixed>> */
-    public function bracketTeams(): array
-    {
-        return $this->db->table('teams')
-            ->select('id, team_name, seed, region')
-            ->orderBy('region', 'ASC')
-            ->orderBy('seed', 'ASC')
-            ->get()
-            ->getResultArray();
-    }
-
-    /** @param list<array{team_id:int, region:int, round:int, game:int, team:int}> $picks */
-    public function savePicks(int $groupId, int $userId, array $picks): bool
-    {
-        try {
-            $this->db->transBegin();
-            $this->db->table('picks')->where([
-                'group_id' => $groupId,
-                'user_id'  => $userId,
-            ])->delete();
-
-            foreach ($picks as $pick) {
-                $this->db->table('picks')->insert([
-                    'user_id' => $userId,
-                    'group_id' => $groupId,
-                    'team_id' => $pick['team_id'],
-                    'region'  => $pick['region'],
-                    'round'   => $pick['round'],
-                    'game'    => $pick['game'],
-                    'team'    => $pick['team'],
-                ]);
-            }
-
-            if (! $this->db->transStatus()) {
-                throw new \RuntimeException('The picks transaction failed.');
-            }
-
-            $this->db->transCommit();
-
-            return true;
-        } catch (Throwable $exception) {
-            $this->db->transRollback();
-            log_message('error', 'Pick save failed: ' . $exception->getMessage());
-
-            return false;
-        }
-    }
-
-    /** @return list<array<string, mixed>> */
-    public function pastGames(): array
-    {
-        return $this->db->table('games g')
-            ->select('g.date_played, t1.team_name AS team_1, t2.team_name AS team_2, s.score AS score_1, s.score_2 AS score_2')
-            ->join('teams t1', 't1.id = g.team_id_1')
-            ->join('teams t2', 't2.id = g.team_id_2')
-            ->join('scores s', 's.game_id = g.id')
-            ->orderBy('g.date_played', 'ASC')
-            ->get()
-            ->getResultArray();
-    }
 }
