@@ -1,0 +1,183 @@
+{
+  "name": "better-bracket",
+  "path": ".",
+  "evidence": [
+    "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php",
+    "db.sql"
+  ],
+  "ddl": [
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:14",
+      "sql": "CREATE TABLE IF NOT EXISTS users (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, email varchar(125) NOT NULL UNIQUE, password varchar(256) NOT NULL, date_joined timestamp without time zone NOT NULL DEFAULT statement_timestamp())"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:15",
+      "sql": "CREATE TABLE IF NOT EXISTS users_profile (user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, first varchar(125) NOT NULL, last varchar(125) NOT NULL, description text, caption varchar(125))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:16",
+      "sql": "CREATE TABLE IF NOT EXISTS groups (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name varchar(125) NOT NULL UNIQUE, date_created timestamp without time zone NOT NULL DEFAULT statement_timestamp())"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:17",
+      "sql": "CREATE TABLE IF NOT EXISTS groups_profile (group_id integer PRIMARY KEY REFERENCES groups(id) ON DELETE CASCADE, picturelocation varchar(256), description text, caption varchar(125))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:18",
+      "sql": "CREATE TABLE IF NOT EXISTS user_groups (group_id integer NOT NULL REFERENCES groups(id) ON DELETE CASCADE, user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE, PRIMARY KEY (group_id, user_id))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:19",
+      "sql": "CREATE TABLE IF NOT EXISTS teams (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, team_name varchar(126) NOT NULL, seed integer NOT NULL CHECK (seed BETWEEN 1 AND 16), region varchar(8) NOT NULL CHECK (region IN ('south', 'west', 'east', 'midwest')), UNIQUE (region, seed))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:20",
+      "sql": "CREATE TABLE IF NOT EXISTS games (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, team_id_1 integer NOT NULL REFERENCES teams(id), team_id_2 integer NOT NULL REFERENCES teams(id), date_played timestamp without time zone NOT NULL, CHECK (team_id_1 <> team_id_2))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:21",
+      "sql": "CREATE TABLE IF NOT EXISTS scores (game_id integer PRIMARY KEY REFERENCES games(id) ON DELETE CASCADE, score smallint NOT NULL CHECK (score >= 0), score_2 smallint NOT NULL CHECK (score_2 >= 0))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:22",
+      "sql": "CREATE TABLE IF NOT EXISTS picks (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE, group_id integer NOT NULL REFERENCES groups(id) ON DELETE CASCADE, team_id integer NOT NULL REFERENCES teams(id), region smallint NOT NULL CHECK (region BETWEEN 0 AND 4), round smallint NOT NULL CHECK (round BETWEEN 1 AND 6), game smallint NOT NULL CHECK (game BETWEEN 1 AND 8), team smallint NOT NULL CHECK (team BETWEEN 1 AND 2), UNIQUE (user_id, group_id, region, round, game, team))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:13",
+      "sql": "CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_unique ON users (LOWER(email))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:14",
+      "sql": "CREATE INDEX IF NOT EXISTS user_groups_user_id_idx ON user_groups (user_id)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:15",
+      "sql": "CREATE INDEX IF NOT EXISTS picks_group_user_idx ON picks (group_id, user_id)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:16",
+      "sql": "CREATE INDEX IF NOT EXISTS picks_team_id_idx ON picks (team_id)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:17",
+      "sql": "CREATE INDEX IF NOT EXISTS games_team_id_1_idx ON games (team_id_1)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:18",
+      "sql": "CREATE INDEX IF NOT EXISTS games_team_id_2_idx ON games (team_id_2)"
+    }
+  ],
+  "queries": [],
+  "schema_errors": [
+    [
+      "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:14",
+      "near \"IDENTITY\": syntax error"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:16",
+      "near \"IDENTITY\": syntax error"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:19",
+      "near \"IDENTITY\": syntax error"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:20",
+      "near \"IDENTITY\": syntax error"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:22",
+      "near \"IDENTITY\": syntax error"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:13",
+      "no such table: main.users"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:15",
+      "no such table: main.picks"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:16",
+      "no such table: main.picks"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:17",
+      "no such table: main.games"
+    ],
+    [
+      "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:18",
+      "no such table: main.games"
+    ]
+  ],
+  "executable_queries": [],
+  "query_errors": [],
+  "tables": [
+    "users_profile",
+    "groups_profile",
+    "user_groups",
+    "scores"
+  ],
+  "selected_ddl": [
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:14",
+      "sql": "CREATE TABLE IF NOT EXISTS users (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, email varchar(125) NOT NULL UNIQUE, password varchar(256) NOT NULL, date_joined timestamp without time zone NOT NULL DEFAULT statement_timestamp())"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:15",
+      "sql": "CREATE TABLE IF NOT EXISTS users_profile (user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, first varchar(125) NOT NULL, last varchar(125) NOT NULL, description text, caption varchar(125))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:16",
+      "sql": "CREATE TABLE IF NOT EXISTS groups (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name varchar(125) NOT NULL UNIQUE, date_created timestamp without time zone NOT NULL DEFAULT statement_timestamp())"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:17",
+      "sql": "CREATE TABLE IF NOT EXISTS groups_profile (group_id integer PRIMARY KEY REFERENCES groups(id) ON DELETE CASCADE, picturelocation varchar(256), description text, caption varchar(125))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:18",
+      "sql": "CREATE TABLE IF NOT EXISTS user_groups (group_id integer NOT NULL REFERENCES groups(id) ON DELETE CASCADE, user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE, PRIMARY KEY (group_id, user_id))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:19",
+      "sql": "CREATE TABLE IF NOT EXISTS teams (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, team_name varchar(126) NOT NULL, seed integer NOT NULL CHECK (seed BETWEEN 1 AND 16), region varchar(8) NOT NULL CHECK (region IN ('south', 'west', 'east', 'midwest')), UNIQUE (region, seed))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:20",
+      "sql": "CREATE TABLE IF NOT EXISTS games (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, team_id_1 integer NOT NULL REFERENCES teams(id), team_id_2 integer NOT NULL REFERENCES teams(id), date_played timestamp without time zone NOT NULL, CHECK (team_id_1 <> team_id_2))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:21",
+      "sql": "CREATE TABLE IF NOT EXISTS scores (game_id integer PRIMARY KEY REFERENCES games(id) ON DELETE CASCADE, score smallint NOT NULL CHECK (score >= 0), score_2 smallint NOT NULL CHECK (score_2 >= 0))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214600_CreateApplicationSchema.php:22",
+      "sql": "CREATE TABLE IF NOT EXISTS picks (id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE, group_id integer NOT NULL REFERENCES groups(id) ON DELETE CASCADE, team_id integer NOT NULL REFERENCES teams(id), region smallint NOT NULL CHECK (region BETWEEN 0 AND 4), round smallint NOT NULL CHECK (round BETWEEN 1 AND 6), game smallint NOT NULL CHECK (game BETWEEN 1 AND 8), team smallint NOT NULL CHECK (team BETWEEN 1 AND 2), UNIQUE (user_id, group_id, region, round, game, team))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:13",
+      "sql": "CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_unique ON users (LOWER(email))"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:14",
+      "sql": "CREATE INDEX IF NOT EXISTS user_groups_user_id_idx ON user_groups (user_id)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:15",
+      "sql": "CREATE INDEX IF NOT EXISTS picks_group_user_idx ON picks (group_id, user_id)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:16",
+      "sql": "CREATE INDEX IF NOT EXISTS picks_team_id_idx ON picks (team_id)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:17",
+      "sql": "CREATE INDEX IF NOT EXISTS games_team_id_1_idx ON games (team_id_1)"
+    },
+    {
+      "source": "app/Database/Migrations/2026-08-31-214700_HardenDatabaseIntegrity.php:18",
+      "sql": "CREATE INDEX IF NOT EXISTS games_team_id_2_idx ON games (team_id_2)"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+-- Parameters: -v roots=5000 -v children=5 (1000x breadth).
+SET search_path TO scale_bench,public;
+INSERT INTO users(email,password,date_joined) SELECT 'u'||i||'@example.invalid','synthetic',TIMESTAMP '2026-10-01' FROM generate_series(1,(:roots * :children)) i;
+ INSERT INTO users_profile(user_id,first,last) SELECT id,'First '||id,'Last '||id FROM users;
+ INSERT INTO groups(name,date_created) SELECT 'Group '||i,TIMESTAMP '2026-10-01'-i*interval '1 minute' FROM generate_series(1,:roots) i;
+ INSERT INTO groups_profile(group_id,description) SELECT id,'Group description' FROM groups;
+ INSERT INTO user_groups(group_id,user_id) SELECT 1+(id-1)%:roots,id FROM users;
+ INSERT INTO teams(team_name,seed,region) SELECT 'Team '||i,1+(i-1)%16,(ARRAY['south','west','east','midwest'])[1+(i-1)/16] FROM generate_series(1,64) i;
+ INSERT INTO games(team_id_1,team_id_2,date_played) SELECT 1,2,TIMESTAMP '2026-10-01 12:00:00'-i*interval '1 day' FROM generate_series(1,:roots) i;
+ INSERT INTO scores(game_id,score,score_2) SELECT id,70,60 FROM games;
+ INSERT INTO picks(user_id,group_id,team_id,region,round,game,team) SELECT u.id,1+(u.id-1)%:roots,1,0,1,1,1 FROM users u;
+ANALYZE;
