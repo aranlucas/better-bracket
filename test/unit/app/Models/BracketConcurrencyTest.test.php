@@ -31,6 +31,7 @@ final class BracketConcurrencyTest extends CIUnitTestCase
                 'DBDriver' => 'Postgre', 'hostname' => getenv('PGHOST'),
                 'database' => getenv('PGDATABASE'), 'username' => getenv('PGUSER'),
                 'password' => getenv('PGPASSWORD'), 'schema' => $schema, 'DBPrefix' => '',
+                'charset' => 'utf8', 'DBDebug' => true,
             ];
             $source = 'require "test/bootstrap.php"; $db = \\Config\\Database::connect(' . var_export($config, true) . ', false);'
                 . '$db->query("SET application_name TO ' . $schema . '");'
@@ -45,8 +46,12 @@ final class BracketConcurrencyTest extends CIUnitTestCase
                 pg_query($db, 'SELECT pg_stat_clear_snapshot()');
                 $result = pg_query_params($db, 'SELECT 1 FROM pg_stat_activity WHERE application_name=$1 AND wait_event_type=\'Lock\'', [$schema]);
                 $blocked = pg_num_rows($result) > 0;
-                if ($blocked || ! proc_get_status($process)['running']) {
+                if ($blocked) {
                     break;
+                }
+                if (! proc_get_status($process)['running']) {
+                    $output = stream_get_contents($pipes[1]) . stream_get_contents($pipes[2]);
+                    self::fail('Save process exited before waiting for membership: ' . $output);
                 }
                 usleep(20_000);
             } while (microtime(true) < $deadline);
