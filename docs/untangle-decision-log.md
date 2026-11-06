@@ -31,14 +31,22 @@ Optional champion confirmation/final-four numbering are persisted contracts. Par
 
 ## Independent inventory review
 
-Subagent inventory_review examined all domains and confirmed decisions 1–5. No additional worthwhile structural changes found. Existing tests all catch credible regressions and should be retained. Follow-up review after implementation remains required.
+Subagent inventory_review examined all domains and confirmed decisions 1–5. No additional worthwhile structural changes found. Existing tests all catch credible regressions and should be retained. Follow-up reviews are recorded below.
 
 ## Resumed review and validation
 
-Re-read exact upstream skill on resume. Reviewer final_review found no confirmed regressions or remaining worthwhile restructuring. Pending: verify model construction under CodeIgniter and add password migration behavior coverage. Removed teamsByRegion test because its production helper was deleted; rendered-slot contract tests remain. JavaScript lint, format:check and git diff --check passed. Host PHP/Composer still absent; checking available Docker runtime before PHP validation.
+Re-read exact upstream skill on resume. Reviewer final_review found no confirmed regressions or remaining worthwhile restructuring. Password migration coverage was subsequently added; CI verified model construction via the moved rollback test. Removed teamsByRegion test because its production helper was deleted; rendered-slot contract tests remain. JavaScript lint, format:check and git diff --check passed. Host PHP/Composer remained absent; subsequent user instruction required all remaining tests to run only in CI.
 
 Password coverage added last: credible regressions are rejecting existing accounts, retaining legacy hashes after login, changing a hash on failed login, or needlessly rewriting a current hash. Expected results follow the existing account compatibility contract and PHP password verification API, independently of the authentication implementation.
 
-Runtime setup note: base php:8.5.12-cli already includes mbstring/sqlite3; first temporary image build failed trying to reinstall built-ins. Corrected image compiles only intl/pgsql/pdo_pgsql. A subsequent interrupted build had no surviving process or image; restarted with durable output at /tmp/better-bracket-validation-build.log. Local PHP validation remains pending; CI also provides the required runtime.
+Runtime setup note: base php:8.5.12-cli already includes mbstring/sqlite3; first temporary image build failed trying to reinstall built-ins. Corrected image compiles only intl/pgsql/pdo_pgsql. A subsequent interrupted build had no surviving process or image; restarted with durable output at /tmp/better-bracket-validation-build.log. Local PHP validation was abandoned in favor of CI after the user required CI-only tests; the owned build was canceled and no local test/build process remains.
 
 Commit gate found pre-existing lint failures in stock error debug.js (excluded by normal lint, included by lint-staged). Replaced obsolete MSIE branches and implicit globals with a private tab collection and explicit window.init/window.toggle entry points used by PHP. CSS.escape preserves generated argument IDs containing punctuation. Diagnostic interaction regression protects tab switching and argument visibility/navigation. Reviewer diagnostic_review found no actionable regressions or worthwhile additional changes. No hooks bypassed.
+
+## Final implementation audit and CI evidence
+
+PR https://github.com/aranlucas/better-bracket/pull/39, implementation head 6fce41f18fe1ccec3fb05917887f14e16dcacc9a. CI run https://github.com/aranlucas/better-bracket/actions/runs/42257464200 reports PHP checks, JavaScript lint and JavaScript tests successful. PHP checks include syntax validation, PHPStan, PHPUnit (including legacy password upgrade and atomic rollback), browser contract tests and Composer strict validation. Container build remains in progress at this record; merge awaits the entire CI result and normal repository requirements. No review comments outstanding.
+
+All justified inventory items implemented. Tournament persistence is independent of group persistence; opening rendering consumes server topology; no teamsByRegion/authenticatedUser callers remain. Legacy account upgrade now writes one modern hash. Required inventory, implementation and diagnostic reviews found no remaining worthwhile issues. Test cleanup retained meaningful coverage and removed only the test for the deleted grouping helper. No dependencies or custom repository scripts added. Deliberately retained contracts/special cases are listed above. No deployment performed.
+
+Latest policy: tests CI-only; Vercel preview/deployment checks alone are nonblocking, with only a permitted per-PR Vercel override authorized. All other checks/review requirements remain mandatory. Coordinator task file read at /home/lucas/.t3/scratch/2026-11-06-run-https-github-com-caldoai-1dbfa43d/portfolio-task.txt; no other top-level threads started, following the user's direct instruction that coordinator handles portfolio launch.
